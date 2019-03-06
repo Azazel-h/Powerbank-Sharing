@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block login_tab %}<li class="nav-item active"><a class="nav-link" href="{% url 'login' %}"> Войти </a></li>{% endblock %}
+
+{% block title %} Войти {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title"> Авторизация </h3>
+                        <form action="{% url 'login' %}" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="id_username"> Введите Ваш логин </label>
+                                <input type="text" id="id_username" class="form-control" name="username" placeholder="Ваш логин">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_password"> Введите Ваш пароль </label>
+                                <input type="password" id="id_password" name="password" class="form-control" placeholder="Ваш пароль">
+                            </div>
+
+                            {% if form.errors %}
+                                <div class="form-group">
+                                    <span class="badge badge-danger">Вы ввели неправильно логин или пароль. Попробуйте заново!</span>
+                                </div>
+                            {% endif %}
+                            <input type="submit" value="Войти" class="btn btn-success" />
+                            <input type="hidden" name="next" value="{{ next }}" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

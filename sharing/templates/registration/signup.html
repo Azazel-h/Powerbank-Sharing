@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block reg_tab %}<li class="nav-item active"><a class="nav-link" href="/accounts/signup"> Зарегистрироваться </a></li>{% endblock %}
+{% block title %} Регистрация {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title"> Регистрация </h3>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="col-md-4 form-group">
+                            <label for="input1"> Введите Ваше имя </label>
+                            <input type="text" name="first_name" class="form-control" id="input1" placeholder="Ваше имя">
+                            {% for error in form.errors.first_name %}
+                                <span class="badge badge-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="input2"> Введите Вашу почту </label>
+                            <input type="email" name="email" class="form-control" id="input2" placeholder="Ваша почта">
+                            {% for error in form.errors.email %}
+                                <span class="badge badge-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="input3"> Придумайте логин </label>
+                            <input type="text" name="username" class="form-control" id="input3" placeholder="Ваш логин">
+                            {% for error in form.errors.username %}
+                                <span class="badge badge-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-md-6 form-group">
+                            <label for="input4"> Придумайте пароль </label>
+                            <input type="password" name="password1" id="input4" class="form-control" placeholder="Ваш пароль">
+                            {% for error in form.errors.password1 %}
+                                <span class="badge badge-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="input5"> Подтвердите пароль </label>
+                            <input type="password" name="password2" id="input5" class="form-control" placeholder="Подтвердите пароль">
+                            {% for error in form.errors.password2 %}
+                                <span class="badge badge-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success"> Зарегистрироваться</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

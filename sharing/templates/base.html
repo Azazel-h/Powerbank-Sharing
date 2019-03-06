@@ -26,14 +26,13 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav">
                         {% block main_tab %}<li class="nav-item"><a class="nav-link" href="/"> Главная </a></li>{% endblock %}
-{#                        {% if user.is_authenticated %}#}
-{#                            {% block add_voting_tab %}<li class="nav-item"><a class="nav-link" href="{% url 'add' %}"> Добавить опрос </a></li>{% endblock %}#}
-{#                            {% block account_tab %}<li class="nav-item"><a class="nav-link" href="{% url 'account' %}"> {{ user.username }} </a></li>{% endblock %}#}
-{#                            <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}?next=/"> Выйти </a></li>#}
-{#                        {% else %}#}
-{#                            {% block login_tab %}<li class="nav-item"><a class="nav-link" href="{% url 'login' %}"> Войти </a></li>{% endblock %}#}
-{#                            {% block reg_tab %}<li class="nav-item"><a class="nav-link" href="/accounts/signup"> Зарегистрироваться </a></li>{% endblock %}#}
-{#                        {% endif %}#}
+                        {% if user.is_authenticated %}
+                            {% block account_tab %}<li class="nav-item"><a class="nav-link" href="{% url 'account' %}"> {{ user.username }} </a></li>{% endblock %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}?next=/"> Выйти </a></li>
+                        {% else %}
+                            {% block login_tab %}<li class="nav-item"><a class="nav-link" href="{% url 'login' %}"> Войти </a></li>{% endblock %}
+                            {% block reg_tab %}<li class="nav-item"><a class="nav-link" href="/accounts/signup"> Зарегистрироваться </a></li>{% endblock %}
+                        {% endif %}
                     </ul>
                 </div>
             </div>

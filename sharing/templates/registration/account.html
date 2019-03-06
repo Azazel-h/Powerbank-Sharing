@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %} Личный кабинет {% endblock %}
+{% block account_tab %}<li class="nav-item active"><a class="nav-link" href="{% url 'account' %}"> {{ user.username }} </a></li> {% endblock %}
+
+{% block content %}
+    <h1 class="text-center"> {{ user.username }} - {{ user.first_name }}</h1>
+    {# Скоро будем делать здесь красоту #}
+{% endblock %}
