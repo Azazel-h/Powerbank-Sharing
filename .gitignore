@@ -1,0 +1,19 @@
+# python files
+*.pyc
+
+# virtual environment
+venv/
+
+# JetBrains IDE
+.idea
+
+__pycache__
+.DS_Store
+
+# database
+db.sqlite3
+
+# Profile Photos
+vote/static/upload/photos*
+!.gitkeep
+
