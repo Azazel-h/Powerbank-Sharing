@@ -19,6 +19,12 @@
             center: [55.76, 37.64],
             zoom: 9
         });
+
+        var search = myMap.controls.get('searchControl');
+        search.events.add("resultselect", function (result) {
+            console.log(search.getResultsArray()[result.get('index')].geometry.getCoordinates())
+            console.log('request: ' + search.getRequestString());
+       });
     });
 </script>
 {% endblock %}
