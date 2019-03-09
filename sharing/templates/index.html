@@ -18,10 +18,7 @@
             var myMap = new ymaps.Map("YMapsID", {
                 center: [55.76, 37.64],
                 zoom: 9,
-                controls: ['searchControl', 'routeButtonControl']
-            }, {
-                // Будет производиться поиск по топонимам и организациям.
-                searchControlProvider: 'yandex#search'
+                controls: ['searchControl', 'routeButtonControl', 'geolocationControl', 'fullscreenControl', 'zoomControl']
             });
 
             var search = myMap.controls.get('searchControl');
