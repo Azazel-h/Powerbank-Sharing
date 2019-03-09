@@ -19,6 +19,7 @@
                 center: [55.76, 37.64],
                 zoom: 9
             });
+            counter = 0;
 
             var search = myMap.controls.get('searchControl');
             search.events.add("resultselect", function (result) {
@@ -27,4 +28,6 @@
            });
         });
     </script>
+    {% load static %}
+    <script src="{% static 'js/locationUser.js' %}"></script>
 {% endblock %}

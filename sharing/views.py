@@ -8,6 +8,12 @@ def index(request):
     return render(request, 'index.html', {})
 
 
+# Добавить организацию
+def add_powerbank_sharing(request):
+    context = {}
+    return render(request, 'sharing/add.html', context)
+
+
 # Работа с пользователем
 def signup(request):
     if request.method == 'POST':

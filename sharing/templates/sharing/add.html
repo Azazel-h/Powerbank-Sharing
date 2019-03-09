@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block add_sharing_tab %}<li class="nav-item active"><a class="nav-link" href="{% url 'add_sharing' %}"> Добавить точку </a></li>{% endblock %}
+{% block title %} Добавить точку {% endblock %}
+
+{% block content %}
+    <style>
+        body, html{
+            width: 100%;
+            height: 85%;
+        }
+    </style>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title"> Добавить точку </h2>
+                <h6 class="card-subtitle mb-2 text-muted"> Здесь Вы можете добавить новую точку для раздачи powerbank'ов для остальных клиентов. </h6>
+
+
+
+                <form method="POST" name="add-sharing">
+                    {% csrf_token %}
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="title"> Введите название </label>
+                            <input type="text" id="title" class="form-control" placeholder="Название новой точки">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        ymaps.ready(function () {
+            var myMap = new ymaps.Map("YMapsID", {
+                center: [55.76, 37.64],
+                zoom: 9
+            });
+
+            var search = myMap.controls.get('searchControl');
+            search.events.add("resultselect", function (result) {
+                console.log(search.getResultsArray()[result.get('index')].geometry.getCoordinates())
+                console.log('request: ' + search.getRequestString());
+           });
+        });
+    </script>
+{% endblock %}
