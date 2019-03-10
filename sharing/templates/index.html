@@ -26,6 +26,16 @@
                 console.log(search.getResultsArray()[result.get('index')].geometry.getCoordinates())
                 console.log('request: ' + search.getRequestString());
            });
+
+            {% for i in sharings %}
+                var myGeoObject = new ymaps.GeoObject({
+                    geometry: {
+                        type: "Point", // тип геометрии - точка
+                        coordinates: [{{ i.crds_lot }}, {{ i.crds_lat }}] // координаты точки
+                    }
+                });
+                myMap.geoObjects.add(myGeoObject);
+            {% endfor %}
         });
     </script>
     {% load static %}

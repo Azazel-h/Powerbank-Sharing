@@ -7,7 +7,7 @@ from sharing.models import Share
 
 
 def index(request):
-    return render(request, 'index.html', {})
+    return render(request, 'index.html', {'sharings': Share.get_all()})
 
 
 # Добавить организацию
