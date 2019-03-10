@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls import url
 from sharing import views
 
 urlpatterns = [
@@ -26,4 +27,6 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/signup', views.signup, name='reg'),
     path('account/', views.account, name='account'),
+
+    url(r'^share/(?P<pk>\d+)/$', views.share_page, name='share_page'),
 ]
