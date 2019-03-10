@@ -13,12 +13,21 @@
     {% block br %} {% endblock %}
     <div id="YMapsID" style="height: 100%; width: 100%;"></div>
 
-<script type="text/javascript">
-    ymaps.ready(function () {
-        var myMap = new ymaps.Map("YMapsID", {
-            center: [55.76, 37.64],
-            zoom: 9
+    <script type="text/javascript">
+        ymaps.ready(function () {
+            var myMap = new ymaps.Map("YMapsID", {
+                center: [55.76, 37.64],
+                zoom: 9,
+                controls: ['searchControl', 'routeButtonControl', 'geolocationControl', 'fullscreenControl', 'zoomControl']
+            });
+
+            var search = myMap.controls.get('searchControl');
+            search.events.add("resultselect", function (result) {
+                console.log(search.getResultsArray()[result.get('index')].geometry.getCoordinates())
+                console.log('request: ' + search.getRequestString());
+           });
         });
-    });
-</script>
+    </script>
+    {% load static %}
+    <script src="{% static 'js/locationUser.js' %}"></script>
 {% endblock %}

@@ -1,11 +1,27 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
 from sharing.forms import SignUpForm
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
+import json
+from sharing.models import Share
 
 
 def index(request):
     return render(request, 'index.html', {})
+
+
+# Добавить организацию
+@login_required
+def add_powerbank_sharing(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        address = request.POST.get('address')
+        crds = json.loads(request.POST.get('crds'))
+        new_sharing = Share(title=title, address=address, crds_lot=crds[0], crds_lat=crds[1])
+        new_sharing.save()
+        return HttpResponse('Новая точка выдачи успешно добавлена!')
+    context = {}
+    return render(request, 'sharing/add.html', context)
 
 
 # Работа с пользователем

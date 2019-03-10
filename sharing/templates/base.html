@@ -27,6 +27,9 @@
                     <ul class="navbar-nav">
                         {% block main_tab %}<li class="nav-item"><a class="nav-link" href="/"> Главная </a></li>{% endblock %}
                         {% if user.is_authenticated %}
+                            {% if user.is_superuser %}
+                                {% block add_sharing_tab %}<li class="nav-item"><a class="nav-link" href="{% url 'add_sharing' %}"> Добавить точку </a></li> {% endblock %}
+                            {% endif %}
                             {% block account_tab %}<li class="nav-item"><a class="nav-link" href="{% url 'account' %}"> {{ user.username }} </a></li>{% endblock %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}?next=/"> Выйти </a></li>
                         {% else %}
