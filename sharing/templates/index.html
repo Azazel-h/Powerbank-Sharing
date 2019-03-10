@@ -28,12 +28,13 @@
            });
 
             {% for i in sharings %}
-                var myGeoObject = new ymaps.GeoObject({
-                    geometry: {
-                        type: "Point", // тип геометрии - точка
-                        coordinates: [{{ i.crds_lot }}, {{ i.crds_lat }}] // координаты точки
-                    }
-                });
+                var myGeoObject = new ymaps.Placemark([{{ i.crds_lot }}, {{ i.crds_lat }}],
+                    {
+                        balloonContent: '{{ i.title }}'
+                    }, {
+                        preset: 'islands#dotIcon',
+                        iconColor: '#179'
+                    });
                 myMap.geoObjects.add(myGeoObject);
             {% endfor %}
         });
