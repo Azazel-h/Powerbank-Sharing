@@ -15,8 +15,9 @@
 
     {#  На релиз надо спрятать весь скрипт в один файл  #}
     <script>
+        var myMap;
         ymaps.ready(function () {
-            var myMap = new ymaps.Map("YMapsID", {
+            myMap = new ymaps.Map("YMapsID", {
                 center: [55.76, 37.64],
                 zoom: 9,
                 controls: ['searchControl', 'routeButtonControl', 'geolocationControl', 'fullscreenControl', 'zoomControl']
@@ -42,7 +43,7 @@
                                     {% if user.is_superuser %}
                                 '        <a href="#" class="btn btn-success mb-1"> Изменить точку? </a>\n' +
                                     {% else %}
-                                '        <a href="#" class="btn btn-success mb-1"> Проложить маршрут </a>\n' +
+                                {#'        <a href="#" class="btn btn-success mb-1" onclick="buildRoute({{ i.id }})"> Проложить маршрут </a>\n' +#}
                                     {% endif %}
                                 '        <a href="{% url 'share_page' pk=i.id %}" class="btn btn-primary mb-1"> На страницу станции </a>\n' +
                                 '    </div>\n' +
