@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
+from sharing.forms import ChangeForm
 from sharing.forms import SignUpForm
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 import json
@@ -42,3 +44,17 @@ def signup(request):
 
 def account(request):
     return render(request, 'registration/account.html', {'user': request.user})
+
+@login_required
+def change(request):
+    if request.method == 'POST':
+        form = ChangeForm(request.user ,request.POST)
+        if form.is_valid():
+            current_user = form.save()
+            update_session_auth_hash(request, current_user)
+            current_user.save()
+            return redirect('/')
+    else:
+        form = ChangeForm(request.user)
+    return render(request, 'registration/change.html', {'form': form})
+
