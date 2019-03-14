@@ -28,21 +28,16 @@ class ChangeForm(PasswordChangeForm):
 class EmailChangeForm(forms.Form):
     new_email1 = forms.EmailField(
         label=("Нова почта"),
-        max_length=50,
-        error_messages={'max_length': 'Максимальная длина возможного имени - 50.', 'required': 'Это поле обязательно.'},
+        max_length=254,
+        error_messages={'max_length': 'Максимальная длина почты - 254.', 'required': 'Это поле обязательно.'},
         widget=forms.EmailInput,
         required=True,
     )
 
     new_email2 = forms.EmailField(
         label=("Подтверждение новой почты"),
-        max_length=50,
-        error_messages={'max_length': 'Максимальная длина возможного имени - 50.', 'required': 'Это поле обязательно.'},
+        max_length=254,
+        error_messages={'max_length': 'Максимальная длина почты - 254.', 'required': 'Это поле обязательно.'},
         widget=forms.EmailInput,
         required=True,
     )
-
-    error_messages = {
-        'required': 'Это поле обязательно.',
-        'password_mismatch': "Пароли не совпадают!",
-    }

@@ -65,9 +65,10 @@ def change_email(request):
         current_user = request.user
         form = EmailChangeForm(request.POST)
         if form.is_valid():
-            current_user.email = form.cleaned_data['new_email1']
-            current_user.save()
-            return redirect('/')
+            if form.cleaned_data['new_email1'] == form.cleaned_data['new_email2']:
+                current_user.email = form.cleaned_data['new_email1']
+                current_user.save()
+                return redirect('/')
     else:
         form = EmailChangeForm()
     return render(request, 'registration/change_email.html', {'form': form})
