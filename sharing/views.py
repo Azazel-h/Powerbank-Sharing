@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 from sharing.forms import ChangeForm
 from sharing.forms import SignUpForm
+from sharing.forms import EmailChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
@@ -57,4 +58,17 @@ def change(request):
     else:
         form = ChangeForm(request.user)
     return render(request, 'registration/change.html', {'form': form})
+
+@login_required
+def change_email(request):
+    if request.method == 'POST':
+        current_user = request.user
+        form = EmailChangeForm(request.POST)
+        if form.is_valid():
+            current_user.email = form.cleaned_data['new_email1']
+            current_user.save()
+            return redirect('/')
+    else:
+        form = EmailChangeForm()
+    return render(request, 'registration/change_email.html', {'form': form})
 
