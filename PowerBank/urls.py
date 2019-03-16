@@ -25,5 +25,5 @@ urlpatterns = [
     path('accounts/signup', views.signup, name='reg'),
     path('account/', views.account, name='account'),
     path('change', views.change, name='change'),
-    path('emailchange', views.change_email, name='change_email')
+    path('emailchange', views.change_email, name='change_email'),
 ]
