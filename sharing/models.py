@@ -11,3 +11,14 @@ class Share(models.Model):
     @staticmethod
     def get_all():
         return Share.objects.all()
+
+
+class Powerbank(models.Model):
+    code = models.CharField(max_length=256)
+    value = models.IntegerField()
+    location = models.CharField(max_length=512)
+    status = models.CharField(max_length=256)
+
+    @staticmethod
+    def get_all():
+        return Powerbank.objects.all()
