@@ -57,8 +57,9 @@
                                 '</div>'
                             {% endif %}
                     }, {
-                        preset: 'islands#dotIcon',
-                        iconColor: '#179'
+                        iconLayout: 'default#image',
+                        {% load static %}
+                        iconImageHref: '{% static 'img/energo-point-t.png' %}'
                     });
                 myMap.geoObjects.add(myGeoObject);
             {% endfor %}
