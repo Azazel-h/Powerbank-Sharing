@@ -4,7 +4,6 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 import json
 from sharing.models import Share
-from datetime import datetime
 
 
 def index(request):
@@ -18,8 +17,6 @@ def add_powerbank_sharing(request):
         title = request.POST.get('title')
         address = request.POST.get('address')
         crds = json.loads(request.POST.get('crds'))
-        time = datetime.now()
-        print(time)
         new_sharing = Share(title=title, address=address, crds_lot=crds[0], crds_lat=crds[1])
         new_sharing.save()
         return HttpResponse('Новая точка выдачи успешно добавлена!')
