@@ -4,6 +4,45 @@
 {% block account_tab %}<li class="nav-item active"><a class="nav-link" href="{% url 'account' %}"> {{ user.username }} </a></li> {% endblock %}
 
 {% block content %}
-    <h1 class="text-center"> {{ user.username }} - {{ user.first_name }}</h1>
-    {# Скоро будем делать здесь красоту #}
+    <div class="container">
+        <hr>
+        <div class="py-3">
+            <div class="row">
+                <div class="col-md-2 text-center">
+                    {% if profile.photo == '' %}
+                        <span class="display-2"><i class="fas fa-users"></i></span>
+                        <a href="#" class="btn btn-outline-success"> Поставить фото</a>
+                    {% else %}
+                        {% load static %}
+                        <img src="" alt="">
+                    {% endif %}
+
+                </div>
+
+                <div class="col-md-10">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">Привет, {{ user.username }}!</h2>
+                            {% if profile.status == '' %}
+                                <span class="text-secondary"> Вы можете поменять свой статус, который увидят все пользователи! </span>
+                                <a href="#"><i class="fas fa-edit"></i></a>
+                            {% else %}
+                                <span class="text-secondary"> {{ profile.status }} </span>
+                            {% endif %}
+
+                            <hr>
+
+                            {% if profile.photo != '' %}
+                                <a href="#" class="btn btn-primary mb-2"> Изменить фото</a>
+                            {% endif %}
+                            <a href="{% url 'change_email' %}" class="btn btn-primary mb-2"> Изменить почту </a>
+                            <a href="{% url 'change_password' %}" class="btn btn-primary mb-2"> Изменить пароль </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <h3> Скоро добавим сюда что-нибудь </h3>
+    </div>
 {% endblock %}

@@ -20,13 +20,12 @@ from sharing import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
     path('', views.index, name='index'),
     path('sharing/add', views.add_powerbank_sharing, name='add_sharing'),
 
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/signup', views.signup, name='reg'),
     path('account/', views.account, name='account'),
-
-    url(r'^share/(?P<pk>\d+)/$', views.share_page, name='share_page'),
+    path('change/pass', views.change_password, name='change_password'),
+    path('change/email', views.change_email, name='change_email'),
 ]

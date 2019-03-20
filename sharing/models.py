@@ -1,4 +1,13 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+
+class Profile(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=512)
+    active_mail = models.BooleanField(default=False)
+    photo = models.CharField(max_length=512)
+    status = models.CharField(max_length=512, default='')
 
 
 class Share(models.Model):
