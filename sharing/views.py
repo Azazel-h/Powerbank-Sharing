@@ -6,7 +6,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 import json
-from sharing.models import Share
+from sharing.models import Share, Profile
 
 
 def index(request):
@@ -36,6 +36,8 @@ def signup(request):
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
+            profile = Profile(user=user)
+            profile.save()
             login(request, user)
             return redirect('/')
     else:
