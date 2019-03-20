@@ -27,6 +27,14 @@ def add_powerbank_sharing(request):
     return render(request, 'sharing/add.html', context)
 
 
+@login_required
+def share_page(request, pk):
+    context = {
+        'share': Share.objects.get(id=pk)
+    }
+    return render(request, 'sharing/share_page.html', context)
+
+
 # Работа с пользователем
 def signup(request):
     if request.method == 'POST':

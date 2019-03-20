@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %} Станция {% endblock %}
+
+{% block content %}
+    <style>
+        body, html{
+            width: 100%;
+            height: 60%;
+        }
+    </style>
+
+    {% block br %} {% endblock %}
+
+    <div id="YMapsID" style="height: 100%; width: 100%;"></div>
+    <div class="container">
+        <hr>
+        <div class="jumbotron">
+            <h1 class="display-4"> Станция #{{ share.id }} - {{ share.title }}</h1>
+            <p class="lead">
+                Эта станция находится по адресу <strong>{{ share.address }}</strong>. На этой странице Вы сможете получить более подробную информацию о ней.
+            </p>
+
+            <hr class="my-4">
+            <p>
+                Скоро здесь будет инфа о доступных там powerbank'ах.
+            </p>
+            {% if user.is_superuser %}
+
+                <a class="btn btn-primary" href="#" role="button"> Добавить информацию о powerbank'ах </a>
+            {% endif %}
+        </div>
+    </div>
+    <script>
+        ymaps.ready(function(){
+            // Указывается идентификатор HTML-элемента.
+            var myMap = new ymaps.Map("YMapsID", {
+                center: [{{ share.crds_lot }}, {{ share.crds_lat }}],
+                zoom: 14
+            });
+
+            var myGeoObject = new ymaps.Placemark([{{ share.crds_lot }}, {{ share.crds_lat }}],
+                {}, {
+                    preset: 'islands#redDotIcon',
+                }
+            );
+            myMap.geoObjects.add(myGeoObject);
+        });
+    </script>
+    {% load static %}
+    <script src="{% static 'js/locationUser.js' %}"></script>
+{% endblock %}
