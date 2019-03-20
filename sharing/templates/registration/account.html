@@ -4,58 +4,76 @@
 {% block account_tab %}<li class="nav-item active"><a class="nav-link" href="{% url 'account' %}"> {{ user.username }} </a></li> {% endblock %}
 
 {% block content %}
-    <h1 class="text-center"> {{ user.username }} - {{ user.first_name }}</h1>
-    {# Скоро будем делать здесь красоту #}
-<body class="bg-light">
-  <div class="py-5">
     <div class="container">
-      <div class="row">
-          {% load static %}
-        <div class="col-md-2" style=""><img class="card-img-top mx-auto rounded-circle" alt="Card image cap" width="150"
-                                            height="147" src="{% static 'img/people_5.png' %}"></div>
-        <div class="col-md-10" style="">
-          <div class="card">
-            <div class="card-body">
-              <h4 class="card-title">Django girls</h4>
-              <p class="card-text">status</p> <a href="#" class="btn btn-primary">change photo<br></a>
+        <hr>
+        <div class="py-3">
+            <div class="row">
+                <div class="col-md-2 text-center">
+                    {% if profile.photo == '' %}
+                        <span class="display-2"><i class="fas fa-users"></i></span>
+                        <a href="#" class="btn btn-outline-success"> Поставить фото</a>
+                    {% else %}
+                        {% load static %}
+                        <img src="" alt="">
+                    {% endif %}
+                </div>
+
+                <div class="col-md-10">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">Привет, {{ user.username }}!</h2>
+                            {% if profile.status == '' %}
+                                <span class="text-secondary"> Вы можете поменять свой статус, который увидят все пользователи! </span>
+                                <a href="#"><i class="fas fa-edit"></i></a>
+                            {% else %}
+                                <span class="text-secondary"> {{ profile.status }} </span>
+                            {% endif %}
+
+                            {% if profile.photo != '' %}
+                                <a href="#" class="btn btn-primary"> Изменить фото</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
-  </div>
-  <div class="">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-4 order-md-2">
-          <h4 class="d-flex justify-content-between mb-3"> <span class="text-muted"><b>Your cart</b></span> <span class="badge badge-secondary badge-pill">3</span> </h4>
-          <ul class="list-group">
-            <li class="list-group-item d-flex justify-content-between">
-              <div>
-                <h6 class="my-0"><b>Product name</b></h6> <small class="text-muted">Brief description</small>
-              </div> <span class="text-muted">$12</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-              <div>
-                <h6 class="my-0"><b>Second product</b></h6> <small class="text-muted">Brief description</small>
-              </div> <span class="text-muted">$8</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-              <div>
-                <h6 class="my-0"><b>Third item</b></h6> <small class="text-muted">Brief description</small>
-              </div> <span class="text-muted">$5</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between"> <span>Total (USD)</span> <b>$20</b> </li>
-          </ul>
-          <form class="card p-2 my-4">
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Promo code">
-              <div class="input-group-append">
-                <button type="submit" class="btn btn-secondary">Redeem</button>
-              </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-md-4 order-md-2">
+                <h4 class="d-flex justify-content-between mb-3"> <span class="text-muted"><b>Your cart</b></span> <span class="badge badge-secondary badge-pill">3</span> </h4>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <div>
+                            <h6 class="my-0"><b>Product name</b></h6> <small class="text-muted">Brief description</small>
+                        </div> <span class="text-muted">$12</span>
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between">
+                        <div>
+                            <h6 class="my-0"><b>Second product</b></h6> <small class="text-muted">Brief description</small>
+                        </div> <span class="text-muted">$8</span>
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between">
+                        <div>
+                            <h6 class="my-0"><b>Third item</b></h6> <small class="text-muted">Brief description</small>
+                        </div> <span class="text-muted">$5</span>
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between"> <span>Total (USD)</span> <b>$20</b> </li>
+                </ul>
+
+                <form class="card p-2 my-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Promo code">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-secondary">Redeem</button>
+                        </div>
+                    </div>
+                </form>
             </div>
-          </form>
-        </div>
+
         <div class="col-md-8 order-md-1">
           <h4 class="mb-3"><b>Information</b></h4>
           <form class="needs-validation" novalidate="">
@@ -143,9 +161,4 @@
         </div>
       </div>
     </div>
-  </div>
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-</body>
 {% endblock %}
