@@ -72,7 +72,7 @@ def change_password(request):
             return redirect('/')
     else:
         form = ChangeFormPassword(request.user)
-    return render(request, 'registration/change_password.html', {'form': form})
+    return render(request, 'edit_user/change_password.html', {'form': form})
 
 
 @login_required
@@ -87,5 +87,5 @@ def change_email(request):
                 return redirect('/')
     else:
         form = EmailChangeForm()
-    return render(request, 'registration/change_email.html', {'form': form})
+    return render(request, 'edit_user/change_email.html', {'form': form})
 
