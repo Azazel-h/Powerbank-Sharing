@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
     path('sharing/add', views.add_powerbank_sharing, name='add_sharing'),
+    url(r'^share/(?P<pk>\d+)/$', views.share_page, name='share_page'),
 
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/signup', views.signup, name='reg'),
