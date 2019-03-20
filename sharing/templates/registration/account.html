@@ -16,6 +16,7 @@
                         {% load static %}
                         <img src="" alt="">
                     {% endif %}
+
                 </div>
 
                 <div class="col-md-10">
@@ -29,9 +30,13 @@
                                 <span class="text-secondary"> {{ profile.status }} </span>
                             {% endif %}
 
+                            <hr>
+
                             {% if profile.photo != '' %}
-                                <a href="#" class="btn btn-primary"> Изменить фото</a>
+                                <a href="#" class="btn btn-primary mb-2"> Изменить фото</a>
                             {% endif %}
+                            <a href="{% url 'change_email' %}" class="btn btn-primary mb-2"> Изменить почту </a>
+                            <a href="{% url 'change_password' %}" class="btn btn-primary mb-2"> Изменить пароль </a>
                         </div>
                     </div>
                 </div>

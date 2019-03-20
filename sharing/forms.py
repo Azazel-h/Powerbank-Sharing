@@ -6,7 +6,9 @@ from django.contrib.auth.models import User
 
 class SignUpForm(UserCreationForm):
     username = forms.CharField(error_messages={'required': 'Это поле обязательно.'})
-    email = forms.EmailField(max_length=254, required=True, error_messages={'max_length': 'Максимальная длина почты - 254.', 'required': 'Это поле обязательно.'})
+    email = forms.EmailField(max_length=254, required=True,
+                             error_messages={'max_length': 'Максимальная длина почты - 254.',
+                                             'required': 'Это поле обязательно.'})
 
     error_messages = {
         'required': 'Это поле обязательно.',
@@ -15,14 +17,15 @@ class SignUpForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'email', 'password1', 'password2')
+        fields = ('username', 'email', 'password1', 'password2')
 
 
-class ChangeForm(PasswordChangeForm):
+class ChangeFormPassword(PasswordChangeForm):
     def __init__(self, *args, **kwargs):
-        super(ChangeForm, self).__init__(*args, **kwargs)
+        super(ChangeFormPassword, self).__init__(*args, **kwargs)
         for field in ('old_password', 'new_password1', 'new_password2'):
             self.fields[field].widget.attrs.update({'class': 'form-control'})
+
 
 class EmailChangeForm(forms.Form):
     new_email1 = forms.EmailField(

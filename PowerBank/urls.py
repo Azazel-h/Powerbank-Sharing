@@ -21,9 +21,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
     path('sharing/add', views.add_powerbank_sharing, name='add_sharing'),
+
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/signup', views.signup, name='reg'),
     path('account/', views.account, name='account'),
-    path('change', views.change, name='change'),
-    path('emailchange', views.change_email, name='change_email'),
+    path('change/pass', views.change_password, name='change_password'),
+    path('change/email', views.change_email, name='change_email'),
 ]
