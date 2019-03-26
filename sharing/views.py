@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from sharing.forms import ChangeFormPassword
 from sharing.forms import SignUpForm
 from sharing.forms import EmailChangeForm
+from sharing.forms import PassportPhotoForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
@@ -10,12 +11,19 @@ from sharing.models import Share, Profile
 
 
 def index(request):
+    if request.user.is_authenticated:
+        if not Profile.objects.filter(user=request.user).exists():
+            new_profile = Profile(user=request.user)
+            new_profile.save()
     return render(request, 'index.html', {'sharings': Share.get_all()})
 
 
 # Добавить организацию
 @login_required
 def add_powerbank_sharing(request):
+    if request.user.is_superuser is False:
+        return redirect('/')
+
     if request.method == 'POST':
         title = request.POST.get('title')
         address = request.POST.get('address')
@@ -53,11 +61,35 @@ def signup(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 
+"""
+Работа с пользователем
+"""
+
+
+@login_required
 def account(request):
+    profile = Profile.objects.get(user=request.user)
     context = {
         'user': request.user,
-        'profile': Profile.objects.get(user=request.user)
+        'profile': profile,
+        'profile_progress': Profile.get_progress_complete_account(request.user)
     }
+
+    if request.method == 'POST' and 'submit-passport' in request.POST:
+        form = PassportPhotoForm(request.POST, request.FILES)
+        if form.is_valid():
+            passport = form.cleaned_data['passport']
+            profile.passport = passport
+            profile.passport_status = 'checking'
+            profile.save()
+    else:
+        form = PassportPhotoForm()
+    context['form'] = form
+
+    if request.method == 'POST' and request.POST.get('name'):
+        name = request.POST.get('name')
+        profile.name = name
+        profile.save()
     return render(request, 'registration/account.html', context)
 
 
