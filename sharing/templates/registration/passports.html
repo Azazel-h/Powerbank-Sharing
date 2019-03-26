@@ -16,6 +16,7 @@
                             <th scope="col"> # </th>
                             <th scope="col"> Пользователь </th>
                             <th scope="col"> Фотография </th>
+                            <th scope="col"> Статус </th>
                             <th scope="col"> Одобрить </th>
                             <th scope="col"> Отклонить</th>
                         </tr>
@@ -26,9 +27,20 @@
                             <tr>
                                 <th scope="row">{{ i.id }}</th>
                                 <td>{{ i.user.username }}</td>
-                                <td><img src="{{ i.passport.url }}" alt="Фото" class="img-fluid rounded" style="max-width: 20%"></td>
-                                <td><button onclick="approve()" class="btn btn-success"> Одобрить </button></td>
-                                <td><button onclick="reject()" class="btn btn-danger"> Отклонить </button></td>
+                                <td><img src="{{ i.passport.url }}" alt="Фото" class="img-fluid rounded" style="max-height: 10%"></td>
+                                <td id="status">
+                                    <strong>
+                                        {% if i.passport_status == 'checking' %}
+                                            <span class="text-warning"> В проверке </span>
+                                        {% elif i.passport_status == 'success' %}
+                                            <span class="text-success"> Одобрено </span>
+                                        {% else %}
+                                            <span class="text-danger"> Отклонено </span>
+                                        {% endif %}
+                                    </strong>
+                                </td>
+                                <td><button onclick="approve({{ i.id }})" class="btn btn-success"> Одобрить </button></td>
+                                <td><button onclick="reject({{ i.id }})" class="btn btn-danger"> Отклонить </button></td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -38,12 +50,36 @@
     </div>
 
     <script>
-    function approve() {
-        
+    function approve(id) {
+        $.ajax({
+            type: 'POST',
+            url: "/account/passports",
+            data:{
+                id: id,
+                status: 'approve',
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (response) {
+                let el = document.getElementById("status");
+                el.innerText = response
+            }
+        })
     }
     
-    function reject() {
-        
+    function reject(id) {
+        $.ajax({
+            type: 'POST',
+            url: "/account/passports",
+            data:{
+                id: id,
+                status: 'reject',
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (response) {
+                let el = document.getElementById("status");
+                el.innerText = response
+            }
+        })
     }
     </script>
 {% endblock %}

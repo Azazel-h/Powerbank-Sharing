@@ -81,11 +81,26 @@ def users_passports(request):
     :return:
     """
     if not request.user.is_superuser:
-        redirect('/')  # Надо сделать страницу-ошибку прав пользователя, чтобы не перебрасывать просто так на главную.
+        return redirect('/error/rights')
 
     context = {
         'passports': Profile.objects.filter(passport_status='checking')[::-1]
     }
+
+    if request.method == 'POST':
+        status = request.POST.get('status')
+        id = request.POST.get('id')
+        profile = Profile.objects.get(id=id)
+
+        if status == 'approve':
+            profile.passport_status = 'success'
+            profile.save()
+            return HttpResponse('success')
+
+        elif status == 'reject':
+            profile.passport_status = 'fail'
+            profile.save()
+            return HttpResponse('fail')
     return render(request, 'registration/passports.html', context)
 
 
@@ -208,3 +223,11 @@ def signup(request):
 
 def contacts(request):
     return render(request, 'contacts.html', {})
+
+
+def error_rights(request):
+    return render(request, 'error_rights.html')
+
+
+def custom_404_page(request):
+    return render(request, '404.html')

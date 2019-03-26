@@ -36,7 +36,8 @@ urlpatterns = [
     path('change/name', views.change_name, name='change_name'),
     path('change/photo', views.change_photo, name='change_photo'),
 
-    path('contacts/', views.contacts, name='contacts')
+    path('contacts/', views.contacts, name='contacts'),
+    path('error/rights', views.error_rights, name='error_rights')
 ]
 
 if settings.DEBUG:

@@ -191,6 +191,8 @@
             })
         }
     </script>
-    {% load static %}
-    <script src="{% static 'js/changeFileInputLabel.js' %}"></script>
+    {% if not profile.passport %}
+        {% load static %}
+        <script src="{% static 'js/changeFileInputLabel.js' %}"></script>
+    {% endif %}
 {% endblock %}
