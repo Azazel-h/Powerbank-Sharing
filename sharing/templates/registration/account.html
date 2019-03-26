@@ -37,7 +37,7 @@
                             <a href="{% url 'change_email' %}" class="btn btn-info mb-2"> Изменить почту </a>
                             <a href="{% url 'change_password' %}" class="btn btn-info mb-2"> Изменить пароль </a>
                             {% if profile.photo != '' %}
-                                <a href="#" class="btn btn-info mb-2"> Изменить фото</a>
+                                <a href="{% url 'change_photo' %}" class="btn btn-info mb-2"> Изменить фото</a>
                             {% endif %}
                         </div>
                     </div>
@@ -51,7 +51,7 @@
                 <hr>
                 <div class="row">
                     {% if not profile.name %}
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-4">
                             <div class="card">
                                 <div class="card-body">
                                     <form action="{% url 'account' %}" method="POST" name="change-name">
@@ -70,7 +70,7 @@
                     {% endif %}
 
                     {% if not profile.passport or profile.passport_status == 'fail' %}
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-4">
                             <div class="card">
                                 <div class="card-body">
                                     <form action="{% url 'account' %}" method="POST" name="send-photo-with-passport" enctype="multipart/form-data">
@@ -115,7 +115,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <h4 class="card-title"> Заполнение профиля </h4>
+                                <h4 class="card-title text-center"> Что еще нужно? </h4>
                                 <ul class="list-group">
                                     {% if profile.name %} <li class="list-group-item list-group-item-success"> Заполнить настоящее имя </li> {% else %} <li class="list-group-item"> Заполнить настоящее имя </li> {% endif %}
                                     {% if profile.photo %} <li class="list-group-item list-group-item-success"> Поставить аватарку </li> {% else %} <li class="list-group-item"> Поставить аватарку </li> {% endif %}
@@ -134,7 +134,7 @@
                             </div>
 
                             <div class="col-md-5">
-                                <h4 class="card-title"> Информация о Вас </h4>
+                                <h4 class="card-title text-center"> Информация о Вас </h4>
                                 <ul class="list-group">
                                     <li class="list-group-item"><span class="text-secondary"> ваш логин </span> <strong>{{ user.username }}</strong></li>
                                     <li class="list-group-item"><span class="text-secondary"> ваша почта </span> <strong>{{ user.email }}</strong></li>
@@ -148,6 +148,15 @@
                 </div>
             </div>
         </div>
+        {% if user.is_superuser %}
+            <hr>
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title"> Админская часть </h2>
+                    <span class="badge badge-info"> Скоро здесь что-то будет </span>
+                </div>
+            </div>
+        {% endif %}
     </div>
 
     <script>
