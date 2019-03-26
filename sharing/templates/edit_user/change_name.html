@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %} Изменить имя {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <ul class="nav nav-tabs">
+            <li class="nav-item"><a class="nav-link" href="{% url 'account' %}"> Мой профиль </a></li>
+            <li class="nav-item"><a class="nav-link active" href="{% url 'change_name' %}"> Изменить имя </a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'change_email' %}"> Изменить почту </a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'change_password' %}"> Изменить пароль </a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'change_photo' %}"> Изменить аватарку </a></li>
+        </ul>
+        <hr>
+
+        <div class="row">
+            {% include 'edit_user/infoUser.html' %}
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="text-center card-title"> Смена имени </h2>
+                        {% if success_text %}
+                            <p class="text-center text-success">
+                                {{ success_text }}
+                            </p>
+                        {% endif %}
+                        <form action="{% url 'change_name' %}" method="POST">
+                            {% csrf_token %}
+
+                            <div class="form-group">
+                                {{ form }}
+                            </div>
+
+                            <div class="text-center">
+                                <input type="submit" class="btn btn-success" value="Изменить">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

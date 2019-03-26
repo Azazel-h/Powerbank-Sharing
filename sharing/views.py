@@ -1,8 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
-from sharing.forms import ChangeFormPassword
-from sharing.forms import SignUpForm
-from sharing.forms import EmailChangeForm
-from sharing.forms import PassportPhotoForm
+from sharing.forms import ChangeFormPassword, SignUpForm, EmailChangeForm, PassportPhotoForm, ChangeNameForm, \
+    AvatarPhotoForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
@@ -101,10 +99,19 @@ def change_password(request):
             current_user = form.save()
             update_session_auth_hash(request, current_user)
             current_user.save()
-            return redirect('/')
+            context = {
+                'form': ChangeFormPassword(request.user),
+                'profile': Profile.objects.get(user=request.user),
+                'success_text': 'Пароль успешно изменен!'
+            }
+            return render(request, 'edit_user/change_password.html', context)
     else:
         form = ChangeFormPassword(request.user)
-    return render(request, 'edit_user/change_password.html', {'form': form})
+    context = {
+        'form': form,
+        'profile': Profile.objects.get(user=request.user),
+    }
+    return render(request, 'edit_user/change_password.html', context)
 
 
 @login_required
@@ -116,8 +123,64 @@ def change_email(request):
             if form.cleaned_data['new_email1'] == form.cleaned_data['new_email2']:
                 current_user.email = form.cleaned_data['new_email1']
                 current_user.save()
-                return redirect('/')
+                context = {
+                    'form': EmailChangeForm(),
+                    'profile': Profile.objects.get(user=request.user),
+                    'success_text': 'Ваша почта успешно изменена!'
+                }
+                return render(request, 'edit_user/change_email.html', context)
     else:
         form = EmailChangeForm()
-    return render(request, 'edit_user/change_email.html', {'form': form})
+    context = {
+        'form': form,
+        'profile': Profile.objects.get(user=request.user)
+    }
+    return render(request, 'edit_user/change_email.html', context)
 
+
+@login_required
+def change_name(request):
+    profile = Profile.objects.get(user=request.user)
+    if request.method == 'POST':
+        form = ChangeNameForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            profile.name = name
+            profile.save()
+            context = {
+                'form': form,
+                'profile': profile,
+                'success_text': 'Ваше имя успешно изменено!'
+            }
+            return render(request, 'edit_user/change_name.html', context)
+    else:
+        form = ChangeNameForm()
+    context = {
+        'form': form,
+        'profile': profile
+    }
+    return render(request, 'edit_user/change_name.html', context)
+
+
+@login_required
+def change_photo(request):
+    profile = Profile.objects.get(user=request.user)
+    if request.method == 'POST':
+        form = AvatarPhotoForm(request.POST, request.FILES)
+        if form.is_valid():
+            photo = form.cleaned_data['photo']
+            profile.photo = photo
+            profile.save()
+            context = {
+                'profile': profile,
+                'form': AvatarPhotoForm(),
+                'success_text': 'Аватарка успешно изменена!'
+            }
+            return render(request, 'edit_user/change_photo.html', context)
+    else:
+        form = AvatarPhotoForm()
+    context = {
+        'profile': profile,
+        'form': form
+    }
+    return render(request, 'edit_user/change_photo.html', context)

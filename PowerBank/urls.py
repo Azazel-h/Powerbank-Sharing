@@ -29,8 +29,11 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/signup', views.signup, name='reg'),
     path('account/', views.account, name='account'),
+
     path('change/pass', views.change_password, name='change_password'),
     path('change/email', views.change_email, name='change_email'),
+    path('change/name', views.change_name, name='change_name'),
+    path('change/photo', views.change_photo, name='change_photo')
 ]
 
 if settings.DEBUG:

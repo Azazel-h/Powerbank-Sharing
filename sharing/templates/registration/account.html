@@ -11,9 +11,9 @@
                 <div class="col-md-2 text-center">
                     {% if not profile.photo %}
                         <span class="display-2"><i class="fas fa-users"></i></span>
-                        <a href="#" class="btn btn-outline-success"> Поставить фото</a>
+                        <a href="{% url 'change_photo' %}" class="btn btn-outline-success"> Поставить фото</a>
                     {% else %}
-                        <img src="{{ profile.photo.url }}" alt="Аватарка" class="img-fluid">
+                        <img src="{{ profile.photo.url }}" alt="Аватарка" class="img-fluid rounded">
                     {% endif %}
 
                 </div>
@@ -31,11 +31,14 @@
                             </div>
                             <hr>
 
-                            {% if profile.photo != '' %}
-                                <a href="#" class="btn btn-primary mb-2"> Изменить фото</a>
+                            {% if profile.name %}
+                                <a href="{% url 'change_name' %}" class="btn btn-info mb-2"> Изменить имя </a>
                             {% endif %}
-                            <a href="{% url 'change_email' %}" class="btn btn-primary mb-2"> Изменить почту </a>
-                            <a href="{% url 'change_password' %}" class="btn btn-primary mb-2"> Изменить пароль </a>
+                            <a href="{% url 'change_email' %}" class="btn btn-info mb-2"> Изменить почту </a>
+                            <a href="{% url 'change_password' %}" class="btn btn-info mb-2"> Изменить пароль </a>
+                            {% if profile.photo != '' %}
+                                <a href="#" class="btn btn-info mb-2"> Изменить фото</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -47,46 +50,49 @@
                 <h2 class="card-title"> Заполните свой профиль </h2>
                 <hr>
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <form action="{% url 'account' %}" method="POST" name="change-name">
-                                    {% csrf_token %}
+                    {% if not profile.name %}
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <form action="{% url 'account' %}" method="POST" name="change-name">
+                                        {% csrf_token %}
 
-                                    <div class="form-group">
-                                        <label for="input_name"> Введите Ваше настоящее имя</label>
-                                        <input type="text" class="form-control" placeholder="Ваше имя" id="input_name">
-                                    </div>
+                                        <div class="form-group">
+                                            <label for="input_name"> Введите Ваше настоящее имя</label>
+                                            <input type="text" class="form-control" placeholder="Ваше имя" id="input_name">
+                                        </div>
 
-                                    <input type="submit" class="btn btn-success" value="Изменить" onclick="change_name()">
-                                </form>
+                                        <input type="submit" class="btn btn-success" value="Изменить" onclick="change_name()">
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
 
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <form action="{% url 'account' %}" method="POST" name="send-photo-with-passport" enctype="multipart/form-data">
-                                    {% csrf_token %}
-                                    <p>
-                                        В мерах безопасности нам необходимо Ваше фото с паспортом (должны быть видны и Вы,
-                                        и Ваш документ). Вы получите доступ к нашему сервису, как только модераторы одобрят
-                                        Вашу заявку. Рассматривается только последняя посылка. Спасибо за понимание!
-                                    </p>
+                    {% if not profile.passport or profile.passport_status == 'fail' %}
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <form action="{% url 'account' %}" method="POST" name="send-photo-with-passport" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <p>
+                                            В мерах безопасности нам необходимо Ваше фото с паспортом (должны быть видны и Вы,
+                                            и Ваш документ). Вы получите доступ к нашему сервису, как только модераторы одобрят
+                                            Вашу заявку. Рассматривается только последняя посылка. Спасибо за понимание!
+                                        </p>
 
-                                    <div class="custom-file">
-                                        {{ form }}
-                                        <label class="custom-file-label" for="customFile" id="customFileLabel"> Выберите фото </label>
-                                    </div>
+                                        <div class="custom-file">
+                                            {{ form }}
+                                            <label class="custom-file-label" for="customFile" id="customFileLabel"> Выберите фото </label>
+                                        </div>
 
-                                    <input name="submit-passport" type="submit" value="Отправить" class="btn btn-success">
-                                </form>
+                                        <input name="submit-passport" type="submit" value="Отправить" class="btn btn-success">
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
                 </div>
-                <hr>
 
                 <div class="card">
                     <div class="card-body">

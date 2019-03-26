@@ -46,8 +46,24 @@ class EmailChangeForm(forms.Form):
     )
 
 
+class ChangeNameForm(forms.ModelForm):
+    name = forms.CharField(
+        label='Изменить имя',
+        max_length=512,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'text', 'placeholder': 'Введите новое имя'})
+    )
+
+    class Meta:
+        model = Profile
+        fields = ('name',)
+
+
 class AvatarPhotoForm(forms.ModelForm):
-    photo = forms.FileField(label='Выберите фото', required=False, widget=forms.FileInput(attrs={'class': 'custom-file-input', 'type': 'file', 'id': 'customFile'}))
+    photo = forms.FileField(
+        label='Выберите фото',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'custom-file-input', 'type': 'file', 'id': 'customFile'})
+    )
 
     class Meta:
         model = Profile
@@ -55,7 +71,10 @@ class AvatarPhotoForm(forms.ModelForm):
 
 
 class PassportPhotoForm(forms.ModelForm):
-    passport = forms.FileField(label='Выберите фото', required=False, widget=forms.FileInput(attrs={'class': 'custom-file-input', 'type': 'file', 'id': 'customFile'}))
+    passport = forms.FileField(
+        label='Выберите фото',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'custom-file-input', 'type': 'file', 'id': 'customFile'}))
 
     class Meta:
         model = Profile
