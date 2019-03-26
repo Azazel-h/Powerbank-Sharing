@@ -41,24 +41,6 @@ def share_page(request, pk):
     return render(request, 'sharing/share_page.html', context)
 
 
-# Работа с пользователем
-def signup(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            profile = Profile(user=user)
-            profile.save()
-            login(request, user)
-            return redirect('/')
-    else:
-        form = SignUpForm()
-    return render(request, 'registration/signup.html', {'form': form})
-
-
 """
 Работа с пользователем
 """
@@ -89,6 +71,22 @@ def account(request):
         profile.name = name
         profile.save()
     return render(request, 'registration/account.html', context)
+
+
+@login_required
+def users_passports(request):
+    """
+    Страница, на которой админ может одобрить фотографию с паспортом или отклонить.
+    :param request:
+    :return:
+    """
+    if not request.user.is_superuser:
+        redirect('/')  # Надо сделать страницу-ошибку прав пользователя, чтобы не перебрасывать просто так на главную.
+
+    context = {
+        'passports': Profile.objects.filter(passport_status='checking')[::-1]
+    }
+    return render(request, 'registration/passports.html', context)
 
 
 @login_required
@@ -184,3 +182,29 @@ def change_photo(request):
         'form': form
     }
     return render(request, 'edit_user/change_photo.html', context)
+
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            profile = Profile(user=user)
+            profile.save()
+            login(request, user)
+            return redirect('/')
+    else:
+        form = SignUpForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
+
+"""
+Разные страницы
+"""
+
+
+def contacts(request):
+    return render(request, 'contacts.html', {})

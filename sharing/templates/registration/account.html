@@ -153,7 +153,24 @@
             <div class="card">
                 <div class="card-body">
                     <h2 class="card-title"> Админская часть </h2>
-                    <span class="badge badge-info"> Скоро здесь что-то будет </span>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title"> Подтверждение паспортов </h4>
+                                    <p>
+                                        Вам нужно смотреть на фотографии, которые отправили пользователи и либо подтвердить заявку,
+                                        разрешив использовать весь функицонал сайт, либо отклонить и попросить пользователя отправить
+                                        еще один вариант. Это очень важно!
+                                    </p>
+                                    <p class="text-center">
+                                        <a href="{% url 'users_passports' %}" class="btn btn-success"> Смотреть заявки </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         {% endif %}

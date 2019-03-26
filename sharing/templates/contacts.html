@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %} Контакты {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title text-center"> Разработчики проекта </h2>
+                <p class="text-center">
+                    {% load static %}
+                    <img src="{% static 'img/boy_red.svg' %}" alt="Иконочка" style="max-width: 15%;">
+                </p>
+                <p class="text-center">
+                    Привет. Мы вообще очень рады, что Вы решили сюда зайти. Вам либо что-то уж очень не понравилось и мы скоро
+                    решим Вашу проблему, либо Вам понравилось и захотелось немного поболтать с нами.
+                </p>
+                <p class="text-center">
+                    <strong> Корицкий Александр, Диана Царькова, Арсений Булгаков, Сергей Рахманов и Дмитрий Кондратьев - </strong> это наши имена.
+                    Всем пис!
+                </p>
+                <p class="text-right">
+                    <strong>С любовью к Вам, <br>
+                        Разработчики <span class="text-success">ENER</span>GO</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

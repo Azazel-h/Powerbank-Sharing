@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %} Заявки пользователей {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title"> Фотографии паспортов </h2>
+                <h6 class="card-subtitle mb-2 text-muted"> Проверяйте осторожно! Важно, чтобы на фотографии было видно и лицо человека, и номер паспорта. </h6>
+                <hr>
+
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col"> # </th>
+                            <th scope="col"> Пользователь </th>
+                            <th scope="col"> Фотография </th>
+                            <th scope="col"> Одобрить </th>
+                            <th scope="col"> Отклонить</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for i in passports %}
+                            <tr>
+                                <th scope="row">{{ i.id }}</th>
+                                <td>{{ i.user.username }}</td>
+                                <td><img src="{{ i.passport.url }}" alt="Фото" class="img-fluid rounded" style="max-width: 20%"></td>
+                                <td><button onclick="approve()" class="btn btn-success"> Одобрить </button></td>
+                                <td><button onclick="reject()" class="btn btn-danger"> Отклонить </button></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function approve() {
+        
+    }
+    
+    function reject() {
+        
+    }
+    </script>
+{% endblock %}
