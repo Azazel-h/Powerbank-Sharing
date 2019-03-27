@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect, HttpResponse, render_to_response
 from sharing.forms import ChangeFormPassword, SignUpForm, EmailChangeForm, PassportPhotoForm, ChangeNameForm, \
     AvatarPhotoForm
 from django.contrib.auth import update_session_auth_hash
@@ -6,6 +6,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 import json
 from sharing.models import Share, Profile
+from django.template import RequestContext
 
 
 def index(request):
@@ -229,5 +230,7 @@ def error_rights(request):
     return render(request, 'error_rights.html')
 
 
-def custom_404_page(request):
-    return render(request, '404.html')
+# def handler404(request, exception, template_name="404.html"):
+#     response = render_to_response("404.html")
+#     response.status_code = 404
+#     return response

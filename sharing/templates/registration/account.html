@@ -13,7 +13,8 @@
                         <span class="display-2"><i class="fas fa-users"></i></span>
                         <a href="{% url 'change_photo' %}" class="btn btn-outline-success"> Поставить фото</a>
                     {% else %}
-                        <img src="{{ profile.photo.url }}" alt="Аватарка" class="img-fluid rounded">
+                        <img src="{{ profile.photo.url }}" alt="Аватарка" class="img-fluid rounded mb-2">
+                        <a href="{% url 'change_photo' %}" class="btn btn-outline-primary mb-2"> Изменить фото</a>
                     {% endif %}
 
                 </div>
@@ -36,9 +37,6 @@
                             {% endif %}
                             <a href="{% url 'change_email' %}" class="btn btn-info mb-2"> Изменить почту </a>
                             <a href="{% url 'change_password' %}" class="btn btn-info mb-2"> Изменить пароль </a>
-                            {% if profile.photo != '' %}
-                                <a href="{% url 'change_photo' %}" class="btn btn-info mb-2"> Изменить фото</a>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
