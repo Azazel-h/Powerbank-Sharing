@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %} Смена почты {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <ul class="nav nav-tabs">
+            <li class="nav-item"><a class="nav-link" href="{% url 'account' %}"> Мой профиль </a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'change_name' %}"> Изменить имя </a></li>
+            <li class="nav-item"><a class="nav-link active" href="{% url 'change_email' %}"> Изменить почту </a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'change_password' %}"> Изменить пароль </a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'change_photo' %}"> Изменить аватарку </a></li>
+        </ul>
+        <hr>
+
+        <div class="row">
+            {% include 'edit_user/infoUser.html' %}
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title text-center"> Смена почты </h2>
+                        {% if success_text %}
+                            <p class="text-center text-success">
+                                {{ success_text }}
+                            </p>
+                        {% endif %}
+                        <form method="POST">
+                            {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="input3"> Новый адрес </label>
+                                    <input type="email" name="new_email1" id="input3" class="form-control" placeholder="Новая почта">
+                                    {% for error in form.errors %}
+                                        <span class="badge badge-danger">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="form-group">
+                                    <label for="input4"> Подтвердите новый адрес </label>
+                                    <input type="email" name="new_email2" id="input4" class="form-control" placeholder="Введите еще раз">
+                                    {% for error in form.errors %}
+                                        <span class="badge badge-danger">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-success"> Сменить почту</button>
+                                </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

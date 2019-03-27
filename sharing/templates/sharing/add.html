@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block head %}
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=075bb3b0-b81f-467f-bd2f-9eb347ae8f1a&lang=ru_RU" type="text/javascript"></script>
+{% endblock %}
+
 {% block add_sharing_tab %}<li class="nav-item active"><a class="nav-link" href="{% url 'add_sharing' %}"> Добавить точку </a></li>{% endblock %}
 {% block title %} Добавить точку {% endblock %}
 

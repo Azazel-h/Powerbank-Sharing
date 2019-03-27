@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
+from sharing.models import Profile
 
 
 class SignUpForm(UserCreationForm):
@@ -29,7 +30,7 @@ class ChangeFormPassword(PasswordChangeForm):
 
 class EmailChangeForm(forms.Form):
     new_email1 = forms.EmailField(
-        label=("Нова почта"),
+        label=("Новая почта"),
         max_length=254,
         error_messages={'max_length': 'Максимальная длина почты - 254.', 'required': 'Это поле обязательно.'},
         widget=forms.EmailInput,
@@ -43,3 +44,38 @@ class EmailChangeForm(forms.Form):
         widget=forms.EmailInput,
         required=True,
     )
+
+
+class ChangeNameForm(forms.ModelForm):
+    name = forms.CharField(
+        label='Изменить имя',
+        max_length=512,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'text', 'placeholder': 'Введите новое имя'})
+    )
+
+    class Meta:
+        model = Profile
+        fields = ('name',)
+
+
+class AvatarPhotoForm(forms.ModelForm):
+    photo = forms.FileField(
+        label='Выберите фото',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'custom-file-input', 'type': 'file', 'id': 'customFile'})
+    )
+
+    class Meta:
+        model = Profile
+        fields = ('photo',)
+
+
+class PassportPhotoForm(forms.ModelForm):
+    passport = forms.FileField(
+        label='Выберите фото',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'custom-file-input', 'type': 'file', 'id': 'customFile'}))
+
+    class Meta:
+        model = Profile
+        fields = ('passport',)

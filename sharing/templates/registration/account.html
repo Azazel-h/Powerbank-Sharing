@@ -9,12 +9,12 @@
         <div class="py-3">
             <div class="row">
                 <div class="col-md-2 text-center">
-                    {% if profile.photo == '' %}
+                    {% if not profile.photo %}
                         <span class="display-2"><i class="fas fa-users"></i></span>
-                        <a href="#" class="btn btn-outline-success"> Поставить фото</a>
+                        <a href="{% url 'change_photo' %}" class="btn btn-outline-success"> Поставить фото</a>
                     {% else %}
-                        {% load static %}
-                        <img src="" alt="">
+                        <img src="{{ profile.photo.url }}" alt="Аватарка" class="img-fluid rounded mb-2">
+                        <a href="{% url 'change_photo' %}" class="btn btn-outline-primary mb-2"> Изменить фото</a>
                     {% endif %}
 
                 </div>
@@ -22,27 +22,175 @@
                 <div class="col-md-10">
                     <div class="card">
                         <div class="card-body">
-                            <h2 class="card-title">Привет, {{ user.username }}!</h2>
-                            {% if profile.status == '' %}
-                                <span class="text-secondary"> Вы можете поменять свой статус, который увидят все пользователи! </span>
-                                <a href="#"><i class="fas fa-edit"></i></a>
-                            {% else %}
-                                <span class="text-secondary"> {{ profile.status }} </span>
-                            {% endif %}
-
+                            <h1 class="card-title">Привет, {{ user.username }}!</h1>
+                            <h4 class="text-secondary"> Ваш профиль заполнен на
+                                {{ profile_progress.percentage }}
+                                процентов!
+                            </h4>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: {{ profile_progress.percentage }}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
                             <hr>
 
-                            {% if profile.photo != '' %}
-                                <a href="#" class="btn btn-primary mb-2"> Изменить фото</a>
+                            {% if profile.name %}
+                                <a href="{% url 'change_name' %}" class="btn btn-info mb-2"> Изменить имя </a>
                             {% endif %}
-                            <a href="{% url 'change_email' %}" class="btn btn-primary mb-2"> Изменить почту </a>
-                            <a href="{% url 'change_password' %}" class="btn btn-primary mb-2"> Изменить пароль </a>
+                            <a href="{% url 'change_email' %}" class="btn btn-info mb-2"> Изменить почту </a>
+                            <a href="{% url 'change_password' %}" class="btn btn-info mb-2"> Изменить пароль </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <hr>
-        <h3> Скоро добавим сюда что-нибудь </h3>
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title"> Заполните свой профиль </h2>
+                <hr>
+                <div class="row">
+                    {% if not profile.name %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <form action="{% url 'account' %}" method="POST" name="change-name">
+                                        {% csrf_token %}
+
+                                        <div class="form-group">
+                                            <label for="input_name"> Введите Ваше настоящее имя</label>
+                                            <input type="text" class="form-control" placeholder="Ваше имя" id="input_name">
+                                        </div>
+
+                                        <input type="submit" class="btn btn-success" value="Изменить" onclick="change_name()">
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if not profile.passport or profile.passport_status == 'fail' %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <form action="{% url 'account' %}" method="POST" name="send-photo-with-passport" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <p>
+                                            В мерах безопасности нам необходимо Ваше фото с паспортом (должны быть видны и Вы,
+                                            и Ваш документ). Вы получите доступ к нашему сервису, как только модераторы одобрят
+                                            Вашу заявку. Рассматривается только последняя посылка. Спасибо за понимание!
+                                        </p>
+
+                                        <div class="custom-file">
+                                            {{ form }}
+                                            <label class="custom-file-label" for="customFile" id="customFileLabel"> Выберите фото </label>
+                                        </div>
+
+                                        <input name="submit-passport" type="submit" value="Отправить" class="btn btn-success">
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                {% if profile.passport %}
+                                    <h4 class="card-title"> Проверка паспорта </h4>
+                                    <span class="badge badge-info mb-2"> Ваша фотография </span>
+                                    {% if profile.passport_status == 'success' %}
+                                        <span class="badge badge-success"> Одобрено </span>
+                                    {% elif profile.passport_status == 'checking' %}
+                                        <span class="badge badge-warning"> Проверяется </span>
+                                    {% elif profile.passport_status == 'fail' %}
+                                        <span class="badge badge-danger"> Не одобрено - отправьте заново </span>
+                                    {% endif %}
+                                    <img src="{{ profile.passport.url }}" alt="Фотография с паспортом" class="img-fluid rounded">
+                                {% else %}
+                                    <h6 class="card-title"> Здесь будет информация о фотографии с паспортом </h6>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-4">
+                                <h4 class="card-title text-center"> Что еще нужно? </h4>
+                                <ul class="list-group">
+                                    {% if profile.name %} <li class="list-group-item list-group-item-success"> Заполнить настоящее имя </li> {% else %} <li class="list-group-item"> Заполнить настоящее имя </li> {% endif %}
+                                    {% if profile.photo %} <li class="list-group-item list-group-item-success"> Поставить аватарку </li> {% else %} <li class="list-group-item"> Поставить аватарку </li> {% endif %}
+                                    {% if profile.active_mail %} <li class="list-group-item list-group-item-success"> Подтвердить почту </li> {% else %} <li class="list-group-item"> Подтвердить почту </li> {% endif %}
+
+                                    {% if profile.passport_status == 'checking' %}
+                                        <li class="list-group-item list-group-item-warning"> Отправить фото с паспортом </li>
+                                    {% elif profile.passport_status == 'success' %}
+                                        <li class="list-group-item list-group-item-success"> Отправить фото с паспортом </li>
+                                    {% elif profile.passport_status == 'fail' %}
+                                        <li class="list-group-item list-group-item-danger"> Отправить фото с паспортом </li>
+                                    {% else %}
+                                        <li class="list-group-item"> Отправить фото с паспортом </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+
+                            <div class="col-md-5">
+                                <h4 class="card-title text-center"> Информация о Вас </h4>
+                                <ul class="list-group">
+                                    <li class="list-group-item"><span class="text-secondary"> ваш логин </span> <strong>{{ user.username }}</strong></li>
+                                    <li class="list-group-item"><span class="text-secondary"> ваша почта </span> <strong>{{ user.email }}</strong></li>
+                                    {% if profile.name %}
+                                        <li class="list-group-item"><span class="text-secondary"> ваше имя </span> <strong>{{ profile.name }}</strong></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if user.is_superuser %}
+            <hr>
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title"> Админская часть </h2>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title"> Подтверждение паспортов </h4>
+                                    <p>
+                                        Вам нужно смотреть на фотографии, которые отправили пользователи и либо подтвердить заявку,
+                                        разрешив использовать весь функицонал сайт, либо отклонить и попросить пользователя отправить
+                                        еще один вариант. Это очень важно!
+                                    </p>
+                                    <p class="text-center">
+                                        <a href="{% url 'users_passports' %}" class="btn btn-success"> Смотреть заявки </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </div>
+
+    <script>
+        function change_name() {
+            $.ajax({
+                type: "POST",
+                url: "/account/",
+                data:{
+                    name: document.getElementById("input_name").value,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    console.log(response)
+                }
+            })
+        }
+    </script>
+    {% if not profile.passport %}
+        {% load static %}
+        <script src="{% static 'js/changeFileInputLabel.js' %}"></script>
+    {% endif %}
 {% endblock %}

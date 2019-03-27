@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %} 404! {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="card text-white bg-danger">
+            <div class="card-header"> Ошибка 404! </div>
+            <div class="card-body">
+                <h5 class="card-title"> У нас проблема </h5>
+                <p class="card-text">
+                    Вы кажется немного заблудились, однако это совсем не страшно. Сейчас мы поможем Вам отсюда выбраться!
+                </p>
+                <p class="text-center">
+                    <a href="/" class="btn btn-success"> Главная </a>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,22 @@
+<div class="col-md-6">
+    <div class="card">
+        <div class="card-body">
+            <p>
+                <span class="text-secondary"> Ваш логин </span> <strong>{{ user.username }}</strong>
+            </p>
+            {% if profile.name %}
+                <p>
+                    <span class="text-secondary"> Ваше имя </span> <strong>{{ profile.name }}</strong>
+                </p>
+            {% endif %}
+            <p>
+                <span class="text-secondary"> Ваша почта </span> <strong>{{ user.email }}</strong>
+            </p>
+            {% if profile.photo %}
+                <p>
+                    <span class="text-secondary"> Ваша аватарка </span><br> <img src="{{ profile.photo.url }}" alt="Аватарка" class="img-fluid rounded" style="max-width: 25%;">
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</div>

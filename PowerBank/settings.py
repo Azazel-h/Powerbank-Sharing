@@ -133,3 +133,6 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'admpowerbanksharing@gmail.com'
 EMAIL_HOST_PASSWORD = 'lol12345lol'
 EMAIL_USE_TLS = True
+
+MEDIA_URL = '/sharing/static/img/uploads/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'sharing/static/img/uploads/')
