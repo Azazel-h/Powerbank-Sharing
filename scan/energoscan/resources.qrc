@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/energologo">
+        <file>energo-full-t.png</file>
+        <file>energo-label-t.png</file>
+        <file>energo-point-t.png</file>
+        <file>energo-app-w.png</file>
+        <file>energo-icon-w.png</file>
+        <file>energo-full-tq.png</file>
+    </qresource>
+</RCC>
