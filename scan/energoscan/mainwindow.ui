@@ -66,20 +66,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="label">
-      <property name="font">
-       <font>
-        <family>Consolas</family>
-        <pointsize>16</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Username</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="emailEdit">
+     <widget class="QLineEdit" name="usernameEdit">
       <property name="font">
        <font>
         <family>Consolas</family>
@@ -93,19 +80,6 @@
       </property>
       <property name="placeholderText">
        <string>Username</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_2">
-      <property name="font">
-       <font>
-        <family>Consolas</family>
-        <pointsize>16</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Password</string>
       </property>
      </widget>
     </item>

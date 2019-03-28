@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 import json
 from sharing.models import Share, Profile
 from django.template import RequestContext
+from django.http import JsonResponse
 
 
 def index(request):
@@ -216,6 +217,45 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'registration/signup.html', {'form': form})
 
+
+"""
+Android API
+"""
+def app_login(request):
+    """
+    Обработка логина в приложении
+    Если User'a с такими данными нет или пользователь не подтвердил
+    свою учетную запись и/или свои паспортные данные, то возвращается сообщение о провале.
+    Иначе возвращается сообщение об успехе и краткая информация о пользователе.
+    
+    Состояние профиля      |    status
+    -----------------------|----------
+    Не существует          |    badlogindata
+    Не подтвержден email   |    bademail
+    Не подтвержден паспорт |    badpassport
+    Подтвержден            |    ok
+
+    """
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        raw_password = request.POST.get('raw_password')
+        user = authenticate(username=username, password=raw_password)
+        if user == None:
+            return JsonResponse({"status" : "badlogindata"})
+        else:
+            profile = Profile(user=user)
+            if not profile.active_mail:
+                return JsonResponse({"status" : "bademail"})
+            if not profile.passport_status == 'success':
+                return JsonResponse({"status" : "badpassport"})
+            resp = {
+                "status" : "ok",
+                "name" : profile.name,
+                "photo_url" : profile.photo
+            }
+            return JsonResponse(resp)
+    else:
+        return redirect('/')
 
 """
 Разные страницы
