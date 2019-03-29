@@ -8,6 +8,7 @@ import json
 from sharing.models import Share, Profile
 from django.template import RequestContext
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 
 def index(request):
@@ -221,6 +222,7 @@ def signup(request):
 """
 Android API
 """
+@csrf_exempt
 def app_login(request):
     """
     Обработка логина в приложении
@@ -237,9 +239,13 @@ def app_login(request):
 
     """
     if request.method == 'POST':
-        username = request.POST.get('username')
-        raw_password = request.POST.get('raw_password')
+        data = request.body.decode()
+        data_dict = json.loads(data)
+        username = data_dict['username']
+        raw_password = data_dict['raw_password']
+        print(username, raw_password)
         user = authenticate(username=username, password=raw_password)
+        print(user)
         if user == None:
             return JsonResponse({"status" : "badlogindata"})
         else:
