@@ -243,9 +243,7 @@ def app_login(request):
         data_dict = json.loads(data)
         username = data_dict['username']
         raw_password = data_dict['raw_password']
-        print(username, raw_password)
         user = authenticate(username=username, password=raw_password)
-        print(user)
         if user == None:
             return JsonResponse({"status" : "badlogindata"})
         else:
