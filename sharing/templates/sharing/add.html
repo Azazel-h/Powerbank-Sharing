@@ -31,6 +31,11 @@
                             <label for="suggest"><strong> Адрес точки </strong></label>
                             <input type="text" id="suggest" class="form-control" placeholder="Введите адрес" required>
                         </div>
+                        
+                        <div class="form-group col-md-6">
+                            <label for="qrcode"><strong> Данные QR-кода </strong></label>
+                            <input type="text" id="qrcode" class="form-control" placeholder="Данные QR-кода" required>
+                        </div>
                     </div>
 
                     <div class="form-group text-center">
@@ -61,11 +66,12 @@
 
             crds(request, function (coords) {
                 var title = $('#title').val();
-                send(coords, title, request)
+                var qrcode = $('#qrcode').val();
+                send(coords, title, request, qrcode)
             });
         }
 
-        function send(coords, title, address) {
+        function send(coords, title, address, qrcode) {
             $.ajax({
                 type: "POST",
                 url: "/sharing/add",
@@ -73,6 +79,7 @@
                     crds: JSON.stringify(coords),
                     title: title,
                     address: address,
+                    qrcode: qrcode,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function (response) {

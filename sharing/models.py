@@ -39,6 +39,7 @@ class Share(models.Model):
     crds_lot = models.FloatField()
     crds_lat = models.FloatField()
     time = models.TimeField(auto_now_add=True)
+    qrcode = models.CharField(max_length=512, default='Hello, world!')
 
     @staticmethod
     def get_all():

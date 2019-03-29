@@ -9,6 +9,7 @@ from sharing.models import Share, Profile
 from django.template import RequestContext
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.core import serializers
 
 
 def index(request):
@@ -28,8 +29,9 @@ def add_powerbank_sharing(request):
     if request.method == 'POST':
         title = request.POST.get('title')
         address = request.POST.get('address')
+        qrcode = request.POST.get('qrcode')
         crds = json.loads(request.POST.get('crds'))
-        new_sharing = Share(title=title, address=address, crds_lot=crds[0], crds_lat=crds[1])
+        new_sharing = Share(title=title, address=address, crds_lot=crds[0], crds_lat=crds[1], qrcode=qrcode)
         new_sharing.save()
         return HttpResponse('Новая точка выдачи успешно добавлена!')
     context = {}
@@ -220,50 +222,14 @@ def signup(request):
 
 
 """
-Android API
-"""
-@csrf_exempt
-def app_login(request):
-    """
-    Обработка логина в приложении
-    Если User'a с такими данными нет или пользователь не подтвердил
-    свою учетную запись и/или свои паспортные данные, то возвращается сообщение о провале.
-    Иначе возвращается сообщение об успехе и краткая информация о пользователе.
-    
-    Состояние профиля      |    status
-    -----------------------|----------
-    Не существует          |    badlogindata
-    Не подтвержден email   |    bademail
-    Не подтвержден паспорт |    badpassport
-    Подтвержден            |    ok
-
-    """
-    if request.method == 'POST':
-        data = request.body.decode()
-        data_dict = json.loads(data)
-        username = data_dict['username']
-        raw_password = data_dict['raw_password']
-        user = authenticate(username=username, password=raw_password)
-        if user == None:
-            return JsonResponse({"status" : "badlogindata"})
-        else:
-            profile = Profile(user=user)
-            if not profile.active_mail:
-                return JsonResponse({"status" : "bademail"})
-            if not profile.passport_status == 'success':
-                return JsonResponse({"status" : "badpassport"})
-            resp = {
-                "status" : "ok",
-                "name" : profile.name,
-                "photo_url" : profile.photo
-            }
-            return JsonResponse(resp)
-    else:
-        return redirect('/')
-
-"""
 Разные страницы
 """
+
+def scan(request):
+    qrcodes = []
+    for sh in Share.get_all():
+        qrcodes.append(sh.qrcode)
+    return render(request, 'scan/scan.html', {'qrcodes' : qrcodes})
 
 
 def contacts(request):

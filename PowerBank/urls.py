@@ -39,7 +39,7 @@ urlpatterns = [
     path('contacts/', views.contacts, name='contacts'),
     path('error/rights', views.error_rights, name='error_rights'),
 
-    path('app/login', views.app_login, name='app_login')
+    path('scan', views.scan, name='scan')
 ]
 
 if settings.DEBUG:
