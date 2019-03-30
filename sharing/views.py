@@ -225,11 +225,23 @@ def signup(request):
 Разные страницы
 """
 
+@login_required
 def scan(request):
-    qrcodes = []
-    for sh in Share.get_all():
-        qrcodes.append(sh.qrcode)
-    return render(request, 'scan/scan.html', {'qrcodes' : qrcodes})
+    profile = Profile.objects.get(user=request.user)
+    if not profile.active_mail or profile.passport_status != 'success':
+        return render(request, 'scan/unverified.html')
+    if request.method == 'POST':
+        scanned_code = request.POST.get('qrcode')
+        for share in Share.get_all():
+            if share.qrcode == scanned_code:
+                return render(request, 'contacts.html')
+    else:
+        return render(request, 'scan/scan.html')
+
+
+@login_required
+def session(request):
+    return render(request, 'scan/session.html')
 
 
 def contacts(request):
