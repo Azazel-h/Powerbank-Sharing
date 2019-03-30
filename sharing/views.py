@@ -234,14 +234,32 @@ def scan(request):
         scanned_code = request.POST.get('qrcode')
         for share in Share.get_all():
             if share.qrcode == scanned_code:
-                return render(request, 'contacts.html')
+                if profile.session_status == 'inactive':
+                    profile.session_status = 'on_begin'
+                if profile.session_status == 'active':
+                    profile.session_status = 'on_end'
+                profile.save()
+                return render(request, 'scan/session.html')
     else:
         return render(request, 'scan/scan.html')
 
 
 @login_required
 def session(request):
-    return render(request, 'scan/session.html')
+    profile = Profile.objects.get(user=request.user)
+    if not profile.active_mail or profile.passport_status != 'success':
+        return render(request, 'scan/unverified.html')
+    if not (profile.session_status == 'on_begin' or profile.session_status == 'on_end'):
+        return redirect('/')
+    """
+        Обработка начала/конца сессии -- выдача пб, валидация сессии, прочее
+    """
+    if profile.session_status == 'on_begin':
+        profile.session_status = 'active'
+    else:
+        profile.session_status = 'inactive'
+    profile.save()
+    return render(request, 'scan/session.html', {'session_status' : profile.session_status})
 
 
 def contacts(request):

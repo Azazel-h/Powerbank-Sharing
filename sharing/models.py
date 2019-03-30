@@ -8,6 +8,12 @@ class Profile(models.Model):
                      checking - фотография отправлена, но проходит проверку
                      success - фотография одобрена, проверка прошла успешно
                      fail - фотография не одобрена, не прошла проверку
+
+    session_status: inactive - сессия даже не думает быть начатой (по умолчанию)
+                    on_begin - скан кода произошел, сессия сейчас начнется
+                    active   - сессия активна
+                    on_end   - скан кода произошел, сессия сейчас закончится
+                    fail     - ошибка в процессе сессии
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=512,  null=True)
@@ -15,6 +21,7 @@ class Profile(models.Model):
     photo = models.FileField(upload_to='users/')
     passport = models.FileField(upload_to='passports/')
     passport_status = models.CharField(max_length=216, default='empty')
+    session_status = models.CharField(max_length=256, default='inactive')
 
     @staticmethod
     def get_progress_complete_account(user):
