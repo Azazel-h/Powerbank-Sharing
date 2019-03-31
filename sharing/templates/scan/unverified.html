@@ -9,7 +9,12 @@
                 <h2 class="card-title text-center"> Ваш аккаунт не подтвержден </h2>
                 <p class="text-center">
                     Вы не можете пользоваться данной услугой.
+                    Причины:
+                    {% for i in reasons %}
+                        <br> {{ i }}
+                    {% endfor %}
                 </p>
+                
             </div>
         </div>
     </div>

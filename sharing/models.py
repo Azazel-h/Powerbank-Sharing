@@ -47,6 +47,7 @@ class Share(models.Model):
     crds_lat = models.FloatField()
     time = models.TimeField(auto_now_add=True)
     qrcode = models.CharField(max_length=512, default='Hello, world!')
+    ip = models.CharField(max_length=256, default='127.0.0.1')
 
     @staticmethod
     def get_all():

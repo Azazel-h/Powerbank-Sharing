@@ -30,6 +30,7 @@ def add_powerbank_sharing(request):
         title = request.POST.get('title')
         address = request.POST.get('address')
         qrcode = request.POST.get('qrcode')
+        ip = request.POST.get('ip')
         crds = json.loads(request.POST.get('crds'))
         new_sharing = Share(title=title, address=address, crds_lot=crds[0], crds_lat=crds[1], qrcode=qrcode)
         new_sharing.save()
@@ -229,7 +230,7 @@ def signup(request):
 def scan(request):
     profile = Profile.objects.get(user=request.user)
     if not profile.active_mail or profile.passport_status != 'success':
-        return render(request, 'scan/unverified.html')
+        return unverified(request)
     if request.method == 'POST':
         scanned_code = request.POST.get('qrcode')
         for share in Share.get_all():
@@ -244,11 +245,19 @@ def scan(request):
         return render(request, 'scan/scan.html')
 
 
+def unverified(request):
+    profile = Profile.objects.get(user=request.user)
+    reasons = []
+    if not profile.active_mail:
+        reasons.append('Не активирован почтовый адрес')
+    if not profile.passport_status == 'success':
+        reasons.append('Не подтверждён паспорт')
+    return render(request, 'scan/unverified.html', { 'reasons' : reasons })
+
+
 @login_required
 def session(request):
     profile = Profile.objects.get(user=request.user)
-    if not profile.active_mail or profile.passport_status != 'success':
-        return render(request, 'scan/unverified.html')
     if not (profile.session_status == 'on_begin' or profile.session_status == 'on_end'):
         return redirect('/')
     """
