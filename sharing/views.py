@@ -271,6 +271,16 @@ def session(request):
     return render(request, 'scan/session.html', {'session_status' : profile.session_status})
 
 
+@login_required
+def make_verified(request):
+    profile = Profile.objects.get(user=request.user)
+    profile.passport_status = 'success'
+    profile.session_status = 'inactive'
+    profile.active_mail = True
+    profile.name = 'Sbeve'
+    profile.save()
+    return redirect('/')
+
 def contacts(request):
     return render(request, 'contacts.html', {})
 

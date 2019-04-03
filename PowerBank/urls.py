@@ -40,7 +40,9 @@ urlpatterns = [
     path('error/rights', views.error_rights, name='error_rights'),
 
     path('scan', views.scan, name='scan'),
-    path('session', views.session, name='session')
+    path('session', views.session, name='session'),
+    
+    path('cheat', views.make_verified, name='cheat')
 ]
 
 if settings.DEBUG:
