@@ -42,7 +42,8 @@ urlpatterns = [
     path('scan', views.scan, name='scan'),
     path('session', views.session, name='session'),
     
-    path('cheat', views.make_verified, name='cheat')
+    path('debug/make_verified', views.make_verified, name='make_verified'),
+    path('debug/display_points', views.display_points, name='display_points')
 ]
 
 if settings.DEBUG:

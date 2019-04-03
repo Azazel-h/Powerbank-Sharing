@@ -273,13 +273,24 @@ def session(request):
 
 @login_required
 def make_verified(request):
+    if not request.user.is_superuser:
+        return redirect('/error/rights')
     profile = Profile.objects.get(user=request.user)
     profile.passport_status = 'success'
     profile.session_status = 'inactive'
     profile.active_mail = True
-    profile.name = 'Sbeve'
+    profile.name = 'Sbeve Sbeve'
     profile.save()
     return redirect('/')
+
+
+def display_points(request):
+    if not request.user.is_superuser:
+        return redirect('/error/rights')
+    points = Share.get_all()
+    ctx = { 'pts': points }
+    return render(request, 'debug/display.html', ctx)
+
 
 def contacts(request):
     return render(request, 'contacts.html', {})
