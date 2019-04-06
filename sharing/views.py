@@ -5,8 +5,9 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 import json
-from sharing.models import Share, Profile
+from sharing.models import Share, Profile, Powerbank
 from django.template import RequestContext
+from random import random
 
 
 def index(request):
@@ -33,11 +34,26 @@ def add_powerbank_sharing(request):
     context = {}
     return render(request, 'sharing/add.html', context)
 
+@login_required
+def add_pb(request):
+    if request.user.is_superuser is False:
+        return redirect('/')
+
+    if request.method == 'POST':
+        code = random()
+        location = request.POST.get('location')
+        value = request.POST.get('value')
+        new_pb = Powerbank(code=code, location=location, value=value, status='free')
+        new_pb.save()
+        return HttpResponse('Новый powerbank успешно добавлен!')
+    context = {}
+    return render(request, 'sharing/add_pb.html', context)
 
 @login_required
 def share_page(request, pk):
     context = {
-        'share': Share.objects.get(id=pk)
+        'share': Share.objects.get(id=pk),
+        'pb': Powerbank.objects.filter(location=pk)
     }
     return render(request, 'sharing/share_page.html', context)
 
@@ -53,7 +69,10 @@ def account(request):
     context = {
         'user': request.user,
         'profile': profile,
-        'profile_progress': Profile.get_progress_complete_account(request.user)
+        'profile_progress': Profile.get_progress_complete_account(request.user),
+        'free_power_banks': len(Powerbank.objects.filter(status='free'))*100//len(Powerbank.get_all()),
+        'pb': Powerbank.get_all(),
+        'share': Share.get_all()
     }
 
     if request.method == 'POST' and 'submit-passport' in request.POST:

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block add_sharing_tab %}<li class="nav-item active"><a class="nav-link" href="{% url 'add_sharing' %}"> Добавить точку </a></li>{% endblock %}
+{% block title %} Добавить powerbank на точку {% endblock %}
+
+{% block content %}
+    <style>
+        body, html{
+            width: 100%;
+            height: 85%;
+        }
+    </style>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title"> Добавить PowerBank </h2>
+{#                 <form>#}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                 <label for="location">Текущая станция</label>
+                                 <input type="text" id="location" class="form-control" placeholder="Номер последней станции"
+                                        required>
+                             </div>
+
+                             <div class="form-group col-md-6">
+                                 <label for="value">Заряд</label>
+                                 <input type="text" id="value" class="form-control"
+                                        placeholder="Заряд powerbank'а в процентах" required>
+                             </div>
+                        </div>
+
+                        <div class="form-group text-center">
+                            <p style="color: green">Статус: готов к использованию</p>
+                            <input type="submit" class="btn btn-lg btn-success" value="Создать" onclick="get_info()">
+                        </div>
+{#                 </form>#}
+                </div>
+            </div>
+        </div>
+
+    <script>
+        function get_info() {
+            var value = $('#value').val();
+            var location = $('#location').val();
+            send(location, value)
+        }
+
+        function send(location, value) {
+            $.ajax({
+                type: "POST",
+                url: "/sharing/add_pb",
+                data:{
+                    location, location,
+                    value: value,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    alert(response);
+                }
+            })
+        }
+    </script>
+{% endblock %}

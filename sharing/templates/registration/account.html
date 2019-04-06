@@ -168,6 +168,82 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h3 class="card-title">Свободно powerbank'ов</h3>
+                                    <div class="progress">
+                                        <div class="progress-bar w-{{ free_power_banks }} progress-bar-striped">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a type="button" class="btn btn-primary btn-lg btn-block" href="{% url 'add_power_bank' %}">Добавить powerbank</a></button>
+                            <a type="button" class="btn btn-primary-white btn-lg btn-block" href="{% url 'add_sharing' %}">Добавить станцию</a></button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="col-md-6">
+                                    <h3 class="card-title">Powerbank'и</h3>
+                                    <table class="table">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <td><b>ID</b></td>
+                                                <td><b>Статус</b></td>
+                                                <td><b>Значение</b></td>
+                                                <td><button class="btn btn-primary" role="button">Удалить все</button></td>
+                                                <td><b></b></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for item in pb %}
+                                            <tr>
+                                                <td><a href="#">{{ item.id }}</a></td>
+                                                <td>{{ item.status }}</td>
+                                                <td>{{ item.value }}</td>
+                                                <td><button class="btn btn-primary" role="button">Удалить</button></td>
+                                                <td><button class="btn btn-primary" role="button">Изменить</button></td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="col-md-6">
+                                    <h3 class="card-title">Sharing станции</h3>
+                                    <table class="table">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <td><b>ID</b></td>
+                                                <td><b>Название</b></td>
+                                                <td><b>Адрес</b></td>
+                                                <td><b>Время создания</b></td>
+                                                <td><b>Del</b></td>
+                                                <td><b></b></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for item in share %}
+                                            <tr>
+                                                <td><a href="#">{{ item.id }}</a></td>
+                                                <td>{{ item.title }}</td>
+                                                <td>{{ item.address }}</td>
+                                                <td>{{ item.time }}</td>
+                                                <td><button class="btn btn-primary btn-sm" style="height:30px"></button></td>
+                                                <td><button class="btn btn-primary btn-sm">Изменить</button></td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

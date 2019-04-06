@@ -48,7 +48,7 @@ class Share(models.Model):
 class Powerbank(models.Model):
     code = models.CharField(max_length=256)
     value = models.IntegerField()
-    location = models.CharField(max_length=512)
+    location = models.IntegerField()
     status = models.CharField(max_length=256)
 
     @staticmethod
