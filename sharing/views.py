@@ -7,7 +7,9 @@ from django.contrib.auth.decorators import login_required
 import json
 from sharing.models import Share, Profile, Powerbank
 from django.template import RequestContext
-from random import random
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core import serializers
 
 
 def index(request):
@@ -27,8 +29,10 @@ def add_powerbank_sharing(request):
     if request.method == 'POST':
         title = request.POST.get('title')
         address = request.POST.get('address')
+        qrcode = request.POST.get('qrcode')
+        ip = request.POST.get('ip')
         crds = json.loads(request.POST.get('crds'))
-        new_sharing = Share(title=title, address=address, crds_lot=crds[0], crds_lat=crds[1])
+        new_sharing = Share(title=title, address=address, crds_lot=crds[0], crds_lat=crds[1], qrcode=qrcode)
         new_sharing.save()
         return HttpResponse('Новая точка выдачи успешно добавлена!')
     context = {}
@@ -240,6 +244,60 @@ def signup(request):
 Разные страницы
 """
 
+@login_required
+def scan(request):
+    profile = Profile.objects.get(user=request.user)
+    if not profile.active_mail or profile.passport_status != 'success':
+        return unverified(request)
+    if request.method == 'POST':
+        scanned_code = request.POST.get('qrcode')
+        for share in Share.get_all():
+            if share.qrcode == scanned_code:
+                if profile.session_status == 'inactive':
+                    profile.session_status = 'on_begin'
+                if profile.session_status == 'active':
+                    profile.session_status = 'on_end'
+                profile.save()
+                return render(request, 'scan/session.html')
+    else:
+        return render(request, 'scan/scan.html')
+
+
+def unverified(request):
+    profile = Profile.objects.get(user=request.user)
+    reasons = []
+    if not profile.active_mail:
+        reasons.append('Не активирован почтовый адрес')
+    if not profile.passport_status == 'success':
+        reasons.append('Не подтверждён паспорт')
+    return render(request, 'scan/unverified.html', { 'reasons' : reasons })
+
+
+@login_required
+def session(request):
+    profile = Profile.objects.get(user=request.user)
+    if not (profile.session_status == 'on_begin' or profile.session_status == 'on_end'):
+        return redirect('/')
+    """
+        Обработка начала/конца сессии -- выдача пб, валидация сессии, прочее
+    """
+    if profile.session_status == 'on_begin':
+        profile.session_status = 'active'
+    else:
+        profile.session_status = 'inactive'
+    profile.save()
+    return render(request, 'scan/session.html', {'session_status' : profile.session_status})
+
+
+@login_required
+def make_verified(request):
+    profile = Profile.objects.get(user=request.user)
+    profile.passport_status = 'success'
+    profile.session_status = 'inactive'
+    profile.active_mail = True
+    profile.name = 'Sbeve'
+    profile.save()
+    return redirect('/')
 
 def contacts(request):
     return render(request, 'contacts.html', {})
