@@ -16,21 +16,20 @@
 {#                 <form>#}
                         <div class="form-row">
                             <div class="form-group col-md-6">
-                                 <label for="location">Текущая станция</label>
-                                 <input type="text" id="location" class="form-control" placeholder="Номер последней станции"
+                                 <label for="location">ID автомата выдачи</label>
+                                 <input type="text" id="location" class="form-control" placeholder="1"
                                         required>
                              </div>
 
                              <div class="form-group col-md-6">
-                                 <label for="value">Заряд</label>
+                                 <label for="value">Емкость аккумулятора (mAh)</label>
                                  <input type="text" id="value" class="form-control"
-                                        placeholder="Заряд powerbank'а в процентах" required>
+                                        placeholder="4000" required>
                              </div>
                         </div>
 
                         <div class="form-group text-center">
-                            <p style="color: green">Статус: готов к использованию</p>
-                            <input type="submit" class="btn btn-lg btn-success" value="Создать" onclick="get_info()">
+                            <input type="submit" class="btn btn-lg btn-success" value="Добавить" onclick="get_info()">
                         </div>
 {#                 </form>#}
                 </div>
