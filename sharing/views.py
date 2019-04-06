@@ -13,6 +13,14 @@ from django.core import serializers
 from random import random
 
 
+def powerbank_percentage():
+    free = len(Powerbank.objects.filter(status='free'))
+    total = len(Powerbank.get_all())
+    if total == 0:
+        return 0
+    return free * 100 // total
+
+
 def index(request):
     if request.user.is_authenticated:
         if not Profile.objects.filter(user=request.user).exists():
@@ -75,7 +83,7 @@ def account(request):
         'user': request.user,
         'profile': profile,
         'profile_progress': Profile.get_progress_complete_account(request.user),
-        'free_power_banks': len(Powerbank.objects.filter(status='free'))*100//len(Powerbank.get_all()),
+        'free_power_banks': powerbank_percentage(),
         'pb': Powerbank.get_all(),
         'share': Share.get_all()
     }
