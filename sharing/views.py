@@ -10,6 +10,7 @@ from django.template import RequestContext
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
+from random import random
 
 
 def index(request):
