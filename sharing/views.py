@@ -26,7 +26,7 @@ def index(request):
         if not Profile.objects.filter(user=request.user).exists():
             new_profile = Profile(user=request.user)
             new_profile.save()
-    return render(request, 'index.html', {'sharings': Share.get_all()})
+    return render(request, 'index.html', {'sharings': Share.get_all(), 'pb': Powerbank.get_all()})
 
 
 # Добавить организацию
@@ -57,6 +57,9 @@ def add_pb(request):
         location = request.POST.get('location')
         value = request.POST.get('value')
         new_pb = Powerbank(code=code, location=location, value=value, status='free')
+        share = Share.objects.get(id=location)
+        share.has_pb = True
+        share.save()
         new_pb.save()
         return HttpResponse('Новый powerbank успешно добавлен!')
     context = {}

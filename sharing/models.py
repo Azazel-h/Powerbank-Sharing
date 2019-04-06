@@ -2,6 +2,18 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Powerbank(models.Model):
+    code = models.CharField(max_length=256)
+    value = models.IntegerField()
+    location = models.IntegerField()
+    status = models.CharField(max_length=256)
+    is_held = models.BooleanField(default=False)
+
+    @staticmethod
+    def get_all():
+        return Powerbank.objects.all()
+
+
 class Profile(models.Model):
     """
     passport_status: empty - фотография еще не отправлена (значение по умолчанию)
@@ -22,6 +34,8 @@ class Profile(models.Model):
     passport = models.FileField(upload_to='passports/')
     passport_status = models.CharField(max_length=216, default='empty')
     session_status = models.CharField(max_length=256, default='inactive')
+
+    hold = models.ForeignKey(Powerbank, on_delete=models.SET_NULL, null=True)
 
     @staticmethod
     def get_progress_complete_account(user):
@@ -48,18 +62,8 @@ class Share(models.Model):
     time = models.TimeField(auto_now_add=True)
     qrcode = models.CharField(max_length=512, default='Hello, world!')
     ip = models.CharField(max_length=256, default='127.0.0.1')
+    has_pb = models.BooleanField(default=False)
 
     @staticmethod
     def get_all():
         return Share.objects.all()
-
-
-class Powerbank(models.Model):
-    code = models.CharField(max_length=256)
-    value = models.IntegerField()
-    location = models.IntegerField()
-    status = models.CharField(max_length=256)
-
-    @staticmethod
-    def get_all():
-        return Powerbank.objects.all()
