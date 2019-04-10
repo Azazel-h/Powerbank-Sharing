@@ -65,7 +65,7 @@
                     }, {
                         iconLayout: 'default#image',
                         {% load static %}
-                        {% if i.has_pb %}
+                        {% if i.free_pbs > 0 %}
                         iconImageHref: '{% static 'img/energo-point-t.png' %}'
                         {% else %}
                         iconImageHref: '{% static 'img/energo-point-u-t.png' %}'
