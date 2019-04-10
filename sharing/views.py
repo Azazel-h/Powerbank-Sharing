@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from random import random
 
+free_counted = False
 
 def powerbank_percentage():
     free = len(Powerbank.objects.filter(status='free'))
@@ -25,7 +26,23 @@ def get_profile(user):
     return Profile.objects.get(user=user)
 
 
+def recount_free():
+    shares = Share.get_all()
+    for sh in shares:
+        sh.free_pbs = 0
+        sh.save()
+    pbs = Powerbank.objects.filter(status='free')
+    for item in pbs:
+        share = Share.objects.get(id=item.location)
+        share.free_pbs += 1
+        share.save()
+
+
 def index(request):
+    global free_counted
+    if not free_counted:
+        recount_free()
+        free_counted = True
     if request.user.is_authenticated:
         if not Profile.objects.filter(user=request.user).exists():
             new_profile = Profile(user=request.user)
@@ -33,7 +50,6 @@ def index(request):
     return render(request, 'index.html', {'sharings': Share.get_all(), 'pb': Powerbank.get_all()})
 
 
-# Добавить организацию
 @login_required
 def add_powerbank_sharing(request):
     if request.user.is_superuser is False:
@@ -73,13 +89,18 @@ def add_pb(request):
 def share_page(request, pk):
     pbs = Powerbank.objects.filter(location=pk, status='free')
     pb_size = len(pbs)
-    min_cap = pbs[0].capacity
-    max_cap = pbs[1].capacity
-    for pb in pbs:
-        if pb.capacity > max_cap:
-            max_cap = pb.capacity
-        if pb.capacity < min_cap:
-            min_cap = pb.capacity
+    if pb_size == 0:
+        min_cap = max_cap = 0
+    elif pb_size == 1:
+        min_cap = max_cap = pbs[0].capacity
+    else:
+        min_cap = pbs[0].capacity
+        max_cap = pbs[1].capacity
+        for pb in pbs:
+            if pb.capacity > max_cap:
+                max_cap = pb.capacity
+            if pb.capacity < min_cap:
+                min_cap = pb.capacity
     context = {
         'share': Share.objects.get(id=pk),
         'min_cap' : min_cap,

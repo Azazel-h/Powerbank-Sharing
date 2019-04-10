@@ -40,13 +40,13 @@
                             {% if user.is_authenticated %}
                                 '<div class="card">\n' +
                                 '    <div class="card-body">\n' +
-                                    {% if i.free_pbs == 0 %}
+                                    {% if i.free_pbs > 0 %}
                                 '        <h4 class="card-title"><span class="text-success"> Доступны устройства </h4>\n' +
                                     {% else %}
                                     '    <h4 class="card-title"><span class="text-secondary"> Недоступно </h4>\n' +
                                     {% endif %}
                                     {% if user.is_superuser %}
-                                '        <a href="#" class="btn btn-success mb-1"> Изменить точку? </a>\n' +
+                                '        <a href="{% url 'share_page' pk=i.id %}" class="btn btn-success mb-1"> Изменить точку? </a>\n' +
                                     {% else %}
                                     {% endif %}
                                     {% if i.free_pbs > 0 %}
