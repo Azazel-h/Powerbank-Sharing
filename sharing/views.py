@@ -62,7 +62,7 @@ def add_pb(request):
         capacity = request.POST.get('capacity')
         new_pb = Powerbank(code=code, location=location, capacity=capacity, status='free')
         share = Share.objects.get(id=location)
-        share.has_pb = True
+        share.free_pbs += 1
         share.save()
         new_pb.save()
         return HttpResponse('Новый powerbank успешно добавлен!')
@@ -337,6 +337,8 @@ def ordering(request, pk):
             order.save()
             cand.status = 'ordered'
             # когда юзер отсканит, тогда cand.status = 'occupied'
+            share.free_pbs -= 1
+            share.save()
             cand.save()
             ctx['order_status'] = 'succeess'
         else:

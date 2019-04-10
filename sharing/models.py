@@ -67,7 +67,7 @@ class Share(models.Model):
     time = models.TimeField(auto_now_add=True)
     qrcode = models.CharField(max_length=512, default='Hello, world!')
     ip = models.CharField(max_length=256, default='127.0.0.1')
-    has_pb = models.BooleanField(default=False)
+    free_pbs = models.IntegerField(default=False)
 
     @staticmethod
     def get_all():
