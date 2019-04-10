@@ -22,31 +22,11 @@
         <div class="jumbotron">
             <h1 class="display-4"> Станция #{{ share.id }} - {{ share.title }}</h1>
             <p class="lead">
-                Эта станция находится по адресу <em>{{ share.address }}</em>. На этой странице Вы сможете получить более подробную информацию о ней.
+                Эта станция находится по адресу <em>{{ share.address }}</em>.
             </p>
 
-            <hr class="my-4">
-            <table class="table">
-                <thead class="thead-dark">
-                    <tr>
-                        <td><b>ID</b></td>
-                        <td><b>Статус</b></td>
-                        <td><b>Ёмкость (mAh)</b></td>
-                        <td><b></b></td>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for item in pb %}
-                    <tr>
-                        <td><a href="#">{{ item.id }}</a></td>
-                        <td>{{ item.status }}</td>
-                        <td>{{ item.value }}</td>
-                        <td><button class="btn btn-primary" role="button">Забронировать</button></td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-
+            Доступно {{ amt }} устройств, ёмкостью от {{ min_cap }}mAh до {{ max_cap }}mAh.
+            <a class="btn btn-primary" href="{% url 'ordering' pk=share.id %}">Забронировать...</button>
 
             {% if user.is_superuser %}
 

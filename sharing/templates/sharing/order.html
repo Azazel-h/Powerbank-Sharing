@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block add_sharing_tab %}<li class="nav-item active"><a class="nav-link" href="{% url 'add_sharing' %}"> Добавить точку </a></li>{% endblock %}
+{% block title %} Оформить Powerbank {% endblock %}
+
+{% block content %}
+    <style>
+        body, html{
+            width: 100%;
+            height: 85%;
+        }
+    </style>
+    <!--
+        
+        TODO: переделать интерфейс, чтобы он был user-friendly
+
+        - Изменить N/L на радиобутон
+        - Изменить поле mAh на хрень, которая забыл как называется, но выглядит так:
+          [------------|------------------]
+          100   200   300   400   500   600
+    
+    -->
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title"> Вы выбрали точку: </h2>
+                <h4> {{ location }} </h4>
+{#                 <form>#}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                 <label for="order_type">Когда ван нужен Powerbank? (N - сейчас, L - через 15 минут)</label>
+                                 <input type="text" id="order_type" class="form-control" placeholder="N"
+                                        required>
+                             </div>
+
+                             <div class="form-group col-md-6">
+                                 <label for="pb_capacity">Требуемая ёмкость аккумулятора (mAh)</label>
+                                 <input type="text" id="pb_capacity" class="form-control"
+                                        placeholder="4000" required>
+                             </div>
+                        </div>
+
+                        <div class="form-group text-center">
+                            <input type="submit" class="btn btn-lg btn-outline-primary" value="Заказать" onclick="get_info()">
+                        </div>
+{#                 </form>#}
+                </div>
+            </div>
+        </div>
+
+    <script>
+        function get_info() {
+            var pb_capacity = $('#pb_capacity').val();
+            var order_type = $('#order_type').val();
+            send(order_type, pb_capacity)
+        }
+
+        function send(order_type, pb_capacity) {
+            $.ajax({
+                type: "POST",
+                url: "/order/{{ pk }}/",
+                data:{
+                    order_type, order_type,
+                    pb_capacity: pb_capacity,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    if (order_type === "N")
+                    {
+                        window.location.href = "../../scan"
+                    }
+                    else
+                    {
+                        window.location.href = "../../../"
+                    }
+                }
+            })
+        }
+    </script>
+{% endblock %}

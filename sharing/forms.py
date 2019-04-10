@@ -80,3 +80,17 @@ class PassportPhotoForm(forms.ModelForm):
         model = Profile
         fields = ('passport',)
 
+"""
+class BookingForm(form.ModelForm):
+    pointID = forms.IntegerField(
+        label='ID автомата',
+        required=True,
+        widget=forms.TextInput)
+
+    # pbtype = radiobutton
+    # bookingtype = radiobutton
+
+    class Meta:
+        model = Booking
+        fields = ('shareid', 'pbtype', 'bookingtype')
+"""

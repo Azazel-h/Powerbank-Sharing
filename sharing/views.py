@@ -5,7 +5,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 import json
-from sharing.models import Share, Profile, Powerbank
+from sharing.models import Share, Profile, Powerbank, Order
 from django.template import RequestContext
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -19,6 +19,10 @@ def powerbank_percentage():
     if total == 0:
         return 0
     return free * 100 // total
+
+
+def get_profile(user):
+    return Profile.objects.get(user=user)
 
 
 def index(request):
@@ -55,8 +59,8 @@ def add_pb(request):
     if request.method == 'POST':
         code = random()
         location = request.POST.get('location')
-        value = request.POST.get('value')
-        new_pb = Powerbank(code=code, location=location, value=value, status='free')
+        capacity = request.POST.get('capacity')
+        new_pb = Powerbank(code=code, location=location, capacity=capacity, status='free')
         share = Share.objects.get(id=location)
         share.has_pb = True
         share.save()
@@ -67,9 +71,20 @@ def add_pb(request):
 
 @login_required
 def share_page(request, pk):
+    pbs = Powerbank.objects.filter(location=pk, status='free')
+    pb_size = len(pbs)
+    min_cap = pbs[0].capacity
+    max_cap = pbs[1].capacity
+    for pb in pbs:
+        if pb.capacity > max_cap:
+            max_cap = pb.capacity
+        if pb.capacity < min_cap:
+            min_cap = pb.capacity
     context = {
         'share': Share.objects.get(id=pk),
-        'pb': Powerbank.objects.filter(location=pk)
+        'min_cap' : min_cap,
+        'max_cap' : max_cap,
+        'amt' : pb_size
     }
     return render(request, 'sharing/share_page.html', context)
 
@@ -253,7 +268,7 @@ def signup(request):
 
 
 """
-Разные страницы
+Сканирование кода
 """
 
 @login_required
@@ -300,6 +315,38 @@ def session(request):
     profile.save()
     return render(request, 'scan/session.html', {'session_status' : profile.session_status})
 
+
+"""
+Заказ PB
+"""
+
+@login_required
+def ordering(request, pk):
+    share = Share.objects.get(id=pk)
+    ctx = { "location" : share.address }
+    ctx["pk"] = pk
+    if request.method == 'POST':
+        order_type = request.POST.get('order_type')
+        pb_capacity = request.POST.get('pb_capacity')
+        cand = Powerbank.objects.all().filter(location=pk, capacity=pb_capacity, status='free')[0]
+        if cand != None:
+            if order_type == 'N':
+                order = Order(order_type='immediate', pb=cand, share=share, profile=get_profile(request.user))
+            else:
+                order = Order(order_type='hold', pb=cand, share=share, profile=get_profile(request.user))
+            order.save()
+            cand.status = 'ordered'
+            # когда юзер отсканит, тогда cand.status = 'occupied'
+            cand.save()
+            ctx['order_status'] = 'succeess'
+        else:
+            ctx['order_status'] = 'fail'
+            # не найдено (но такого не будет)
+    return render(request, 'sharing/order.html', context=ctx)
+
+"""
+Шаманство с правами пользователя
+"""
 
 @login_required
 def make_verified(request):

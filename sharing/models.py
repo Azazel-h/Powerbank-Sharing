@@ -3,11 +3,16 @@ from django.contrib.auth.models import User
 
 
 class Powerbank(models.Model):
+    """
+    status: free     - заряжен и готов к использованию
+            ordered  - забронирован, но не используется
+            occupied - используется кем-то
+            charging - заряжается
+    """
     code = models.CharField(max_length=256)
-    value = models.IntegerField()
+    capacity = models.IntegerField()
     location = models.IntegerField()
     status = models.CharField(max_length=256)
-    is_held = models.BooleanField(default=False)
 
     @staticmethod
     def get_all():
@@ -67,3 +72,15 @@ class Share(models.Model):
     @staticmethod
     def get_all():
         return Share.objects.all()
+
+class Order(models.Model):
+    """
+    order_type: hold  - отложенный заказ (бронирование)
+                immediate - немедленный заказ (получить пб прямо сейчас)
+    """
+    share = models.ForeignKey(Share, on_delete=models.SET_NULL, null=True)
+    pb = models.ForeignKey(Powerbank, on_delete=models.SET_NULL, null=True)
+    order_type = models.CharField(max_length=128, default='hold')
+    timestamp = models.TimeField(auto_now_add=True)
+    profile = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True)
+    
