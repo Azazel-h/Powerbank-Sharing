@@ -44,7 +44,9 @@ urlpatterns = [
     path('session', views.session, name='session'),
     
     path('cheat', views.make_verified, name='cheat'),
-    url(r'^order/(?P<pk>\d+)/$', views.ordering, name='ordering')   
+    url(r'^order/(?P<pk>\d+)/$', views.ordering, name='ordering'),  
+    path('pending', views.pending, name='pending'),
+    path('cancelled', views.cancelled, name='cancelled'),
 ]
 
 if settings.DEBUG:

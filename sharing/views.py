@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from random import random
+import datetime
 
 free_counted = False
 
@@ -36,6 +37,13 @@ def recount_free():
         share = Share.objects.get(id=item.location)
         share.free_pbs += 1
         share.save()
+
+
+def get_last_order(profile):
+    orders = Order.objects.filter(profile=profile)
+    if orders == None:
+        return Order(progress='failed')
+    return orders[len(orders) - 1]
 
 
 def index(request):
@@ -294,19 +302,23 @@ def signup(request):
 
 @login_required
 def scan(request):
-    profile = Profile.objects.get(user=request.user)
+    profile = get_profile(request.user)
+    order = get_last_order(profile)
+    print(order.progress)
     if not profile.active_mail or profile.passport_status != 'success':
         return unverified(request)
     if request.method == 'POST':
         scanned_code = request.POST.get('qrcode')
-        for share in Share.get_all():
-            if share.qrcode == scanned_code:
-                if profile.session_status == 'inactive':
-                    profile.session_status = 'on_begin'
-                if profile.session_status == 'active':
-                    profile.session_status = 'on_end'
-                profile.save()
-                return render(request, 'scan/session.html')
+        if order.progress == 'created': # Если пользователь заказал зараннее
+            if order.share.qrcode == scanned_code:
+                order.progress = 'applied'
+                order.save()
+            return render(request, 'scan/session.html')
+        else:
+            '''
+                energo Pro - мнговенный заказ пб без бронирования
+            '''
+            pass
     else:
         return render(request, 'scan/scan.html')
 
@@ -324,17 +336,21 @@ def unverified(request):
 @login_required
 def session(request):
     profile = Profile.objects.get(user=request.user)
-    if not (profile.session_status == 'on_begin' or profile.session_status == 'on_end'):
+    order = get_last_order(profile)
+    pb = order.pb
+    if not order.progress == 'applied':
         return redirect('/')
     """
         Обработка начала/конца сессии -- выдача пб, валидация сессии, прочее
     """
-    if profile.session_status == 'on_begin':
-        profile.session_status = 'active'
+    if pb.status == 'ordered':
+        # eject
+        pb.status = 'occupied'
     else:
-        profile.session_status = 'inactive'
-    profile.save()
-    return render(request, 'scan/session.html', {'session_status' : profile.session_status})
+        # eject
+        pb.status = 'charging'
+    pb.save()
+    return render(request, 'scan/session.html', {'session_status' : pb.status})
 
 
 """
@@ -366,6 +382,29 @@ def ordering(request, pk):
             ctx['order_status'] = 'fail'
             # не найдено (но такого не будет)
     return render(request, 'sharing/order.html', context=ctx)
+
+@login_required
+def pending(request):
+    order = get_last_order(get_profile(request.user))
+    if order.progress != 'created':
+        return redirect('/')
+    ctx = {}
+    deadline = order.timestamp
+    print(order.timestamp)
+    ctx['remaining'] = 'НИСКОЛЬКА МУХАХХАХАХАХАХ'
+    return render(request, 'scan/pending.html', context=ctx)
+        
+        
+@login_required
+def cancelled(request):
+    orders = Order.objects.filter(profile=get_profile(request.user))
+    last = len(orders) - 1
+    order = orders[last]
+    if order.progress != 'created':
+        return redirect('/')
+    order.progress = 'cancelled'
+    order.save()
+    return render(request, 'scan/cancelled.html')
 
 """
 Шаманство с правами пользователя

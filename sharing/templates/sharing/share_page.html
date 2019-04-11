@@ -31,7 +31,7 @@
             {% else %}
             Доступно {{ amt }} устройств ёмкостью от {{ min_cap }} mAh до {{ max_cap }} mAh.
             {% endif %}
-            <a class="btn btn-primary" href="{% url 'ordering' pk=share.id %}">Забронировать...</button>
+            <a class="btn btn-primary" href="{% url 'ordering' pk=share.id %}">Забронировать...</a>
 
             {% if user.is_superuser %}
 

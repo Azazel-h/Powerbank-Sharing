@@ -38,7 +38,6 @@ class Profile(models.Model):
     photo = models.FileField(upload_to='users/')
     passport = models.FileField(upload_to='passports/')
     passport_status = models.CharField(max_length=216, default='empty')
-    session_status = models.CharField(max_length=256, default='inactive')
 
     hold = models.ForeignKey(Powerbank, on_delete=models.SET_NULL, null=True)
 
@@ -77,10 +76,18 @@ class Order(models.Model):
     """
     order_type: hold  - отложенный заказ (бронирование)
                 immediate - немедленный заказ (получить пб прямо сейчас)
+
+    progress: created - заказ только что сделан
+              applied - заказ выполняется (пб у юзера)
+              cancelled - заказ отменен
+              blocked - заказ заблокирован
+              failed - заказ провален (истекло время брони)
+              ended - заказ завершен
     """
     share = models.ForeignKey(Share, on_delete=models.SET_NULL, null=True)
     pb = models.ForeignKey(Powerbank, on_delete=models.SET_NULL, null=True)
     order_type = models.CharField(max_length=128, default='hold')
     timestamp = models.TimeField(auto_now_add=True)
     profile = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True)
+    progress = models.CharField(max_length=128, default='created')
     
