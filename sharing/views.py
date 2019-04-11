@@ -423,12 +423,22 @@ def make_verified(request):
     return redirect('/')
 
 
+@login_required
 def display_points(request):
     if not request.user.is_superuser:
         return redirect('/error/rights')
     points = Share.get_all()
     ctx = { 'pts': points }
     return render(request, 'debug/display.html', ctx)
+
+
+@login_required
+def display_orders(request):
+    if not request.user.is_superuser:
+        return redirect('/error/rights')
+    orders = Order.objects.filter(profile=get_profile(request.user))
+    ctx = { 'orders': orders }
+    return render(request, 'debug/orders.html', ctx)
 
 
 def contacts(request):

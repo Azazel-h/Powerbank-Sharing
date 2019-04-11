@@ -48,7 +48,8 @@ urlpatterns = [
     path('pending', views.pending, name='pending'),
     path('cancelled', views.cancelled, name='cancelled'),
     path('debug/make_verified', views.make_verified, name='make_verified'),
-    path('debug/display_points', views.display_points, name='display_points')
+    path('debug/display_points', views.display_points, name='display_points'),
+    path('debug/display_orders', views.display_orders, name='display_orders')
 ]
 
 if settings.DEBUG:

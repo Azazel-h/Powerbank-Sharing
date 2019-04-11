@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %} DEBUG ZONE {% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% for item in orders %}
+        <h5>{{ item.id }}</h5>
+        {{ item.share.id }}
+        <br>
+        {{ item.pb.capacity }}
+        <br>
+        {{ item.order_type }}
+        <br>
+        {{ item.progress }}
+        <br>
+        {{ item.timestamp }}
+        <br>
+        <br>
+        {% endfor %}
+    </div>
+{% endblock %}
