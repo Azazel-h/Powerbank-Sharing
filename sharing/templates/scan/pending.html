@@ -8,10 +8,10 @@
             <div class="card-body">
                 <h2 class="card-title text-center"> Вы забронировали Powerbank </h2>
                 <p class="text-center">
-                    До окончания бронирования: {{ remaining }}
+                    До окончания бронирования {{ remaining }} минут.
                 </p>
-                <a class="btn btn-primary text-center" href="{% url 'scan' %}">Забрать Powerbank</a>
-                <a class="btn btn-danger text-center" href="{% url 'cancelled' %}">Отменить бронирование</a>
+                <a class="btn btn-primary btn-lg btn-block" href="{% url 'scan' %}">Забрать Powerbank</a>
+                <a class="btn btn-danger btn-lg btn-block" href="{% url 'cancelled' %}">Отменить бронирование</a>
             </div>
         </div>
     </div>

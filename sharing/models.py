@@ -83,11 +83,13 @@ class Order(models.Model):
               blocked - заказ заблокирован
               failed - заказ провален (истекло время брони)
               ended - заказ завершен
+
+    reservation_time: время бронирования в минутах
     """
     share = models.ForeignKey(Share, on_delete=models.SET_NULL, null=True)
     pb = models.ForeignKey(Powerbank, on_delete=models.SET_NULL, null=True)
     order_type = models.CharField(max_length=128, default='hold')
-    timestamp = models.TimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
     profile = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True)
     progress = models.CharField(max_length=128, default='created')
-    
+    reservation_time = models.IntegerField(default=15)

@@ -10,10 +10,12 @@ from django.template import RequestContext
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
+from background_task import background
 from random import random
 import datetime
 
 free_counted = False
+remaining_started = False
 
 def powerbank_percentage():
     free = len(Powerbank.objects.filter(status='free'))
@@ -41,21 +43,60 @@ def recount_free():
 
 def get_last_order(profile):
     orders = Order.objects.filter(profile=profile)
-    if orders == None:
+    if len(orders) == 0:
         return Order(progress='failed')
     return orders[len(orders) - 1]
 
 
+def remaining_min(order):
+    if order.progress != 'created':
+        return None
+    if order.order_type == 'immediate':
+        return None
+    when_ordered = order.timestamp
+    deadline = when_ordered + datetime.timedelta(minutes=order.reservation_time)
+    now = datetime.datetime.now(datetime.timezone.utc)
+    return (deadline - now).total_seconds() / 60.0
+
+
+def fail_order(order):
+    order.progress = 'failed'
+    pb = order.pb
+    share = order.share
+    share.free_pbs += 1
+    pb.status = 'free'
+    share.save()
+    pb.save()
+    order.save()
+
+
+@background(schedule=60)
+def check_reservations():
+    profiles = Profile.objects.all()
+    for pr in profiles:
+        rem = remaining_min(get_last_order(pr))
+        if rem != None:
+            if rem <= 0:
+                fail_order(get_last_order(pr))
+
+
 def index(request):
-    global free_counted
+    show_notification = False
+    global free_counted, remaining_started
     if not free_counted:
         recount_free()
         free_counted = True
+    if not remaining_started:
+        check_reservations()
+        remaining_started = True
     if request.user.is_authenticated:
         if not Profile.objects.filter(user=request.user).exists():
             new_profile = Profile(user=request.user)
             new_profile.save()
-    return render(request, 'index.html', {'sharings': Share.get_all(), 'pb': Powerbank.get_all()})
+        order = get_last_order(get_profile(request.user))
+        if order.progress == 'created':
+            show_notification = True
+    return render(request, 'index.html', {'sharings': Share.get_all(), 'pb': Powerbank.get_all(), 'show_notification': show_notification})
 
 
 @login_required
@@ -359,6 +400,9 @@ def session(request):
 
 @login_required
 def ordering(request, pk):
+    profile = get_profile(request.user)
+    if not profile.active_mail or profile.passport_status != 'success':
+        return unverified(request)
     share = Share.objects.get(id=pk)
     ctx = { "location" : share.address }
     ctx["pk"] = pk
@@ -385,13 +429,18 @@ def ordering(request, pk):
 
 @login_required
 def pending(request):
+    profile = get_profile(request.user)
+    if not profile.active_mail or profile.passport_status != 'success':
+        return unverified(request)
     order = get_last_order(get_profile(request.user))
+    rem = remaining_min(order)
+    if rem != None:
+        if rem <= 0:
+            fail_order(order)
     if order.progress != 'created':
         return redirect('/')
     ctx = {}
-    deadline = order.timestamp
-    print(order.timestamp)
-    ctx['remaining'] = 'НИСКОЛЬКА МУХАХХАХАХАХАХ'
+    ctx['remaining'] = int(remaining_min(order))
     return render(request, 'scan/pending.html', context=ctx)
         
         
