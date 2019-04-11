@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %} DEBUG ZONE {% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% for item in pts %}
+        <h5>{{ item.title }}</h5>
+        {{ item.qrcode }}
+        <br>
+        {{ item.ip }}
+        <br>
+        <br>
+        {% endfor %}
+    </div>
+{% endblock %}
