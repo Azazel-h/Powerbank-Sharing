@@ -26,14 +26,37 @@
                 <h4> {{ location }} </h4>
 {#                 <form>#}
                         <div class="form-row">
-                            <div class="form-group col-md-6">
-                                 <label for="order_type">Когда вам нужен Powerbank? (N - сейчас, L - через 15 минут)</label>
-                                 <input type="text" id="order_type" class="form-control" placeholder="N"
-                                        required>
-                             </div>
+                            <label for="order_type">Когда вам нужен Powerbank?</label>
+                            <div class=" col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
+                                 <label class="btn btn-secondary active">
+                                    <input type="radio" name="order_type" id="ord1" autocomplete="off" checked> Сейчас
+                                 </label>
+                                 <label class="btn btn-secondary active">
+                                    <input type="radio" name="order_type" id="ord2" autocomplete="off"> Через 15 минут
+                                 </label>
+                            </div>
+                                 <!--<input type="text" id="order_type" class="form-control" placeholder="N"
+                                        required>-->
 
                              <div class="form-group col-md-6">
-                                 <label for="pb_capacity">Требуемая ёмкость аккумулятора (mAh)</label>
+                                 <label for="pb_capacity">Требуемая ёмкость аккумулятора</label>
+                                <div class=" col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
+                                    {% if small %}
+                                    <label class="btn btn-secondary active">
+                                        <input type="radio" name="pb_type" id="ord1" autocomplete="off" checked> Маленькая
+                                    </label>
+                                    {% endif %}
+                                    {% if medium %}
+                                    <label class="btn btn-secondary active">
+                                        <input type="radio" name="pb_type" id="ord1" autocomplete="off" checked> Средняя
+                                    </label>
+                                    {% endif %}
+                                    {% if large %}
+                                    <label class="btn btn-secondary active">
+                                        <input type="radio" name="pb_type" id="ord1" autocomplete="off" checked> Большая
+                                    </label>
+                                    {% endif %}
+                                </div>
                                  <input type="text" id="pb_capacity" class="form-control"
                                         placeholder="4000" required>
                              </div>

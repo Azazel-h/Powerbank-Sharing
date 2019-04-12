@@ -10,8 +10,8 @@ from django.template import RequestContext
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
-from background_task import background
-from random import random
+#from background_task import background
+from random import random, randint
 import datetime
 
 free_counted = False
@@ -70,7 +70,7 @@ def fail_order(order):
     order.save()
 
 
-@background(schedule=60)
+#@background(schedule=60)
 def check_reservations():
     profiles = Profile.objects.all()
     for pr in profiles:
@@ -80,11 +80,37 @@ def check_reservations():
                 fail_order(get_last_order(pr))
 
 
+def seed_points():
+    for i in range(120):
+        kw = {}
+        kw['title'] = 'seed'
+        kw['address'] = 'seed'
+        kw['crds_lot'] = float(randint(10, 110))
+        kw['crds_lat'] = float(randint(10, 110))
+        kw['qrcode'] = '777777'
+        kw['free_pbs'] = 0
+        share = Share(title='seed', address='seed', crds_lot=float(randint(10, 110)), crds_lat=float(randint(10, 110)), qrcode='777777', free_pbs=0)
+        print(share)
+        share.save()
+
+
+def seed_pbs():
+    for i in range(120):
+        kw = {}
+        kw['capacity'] = randint(1, 99999)
+        kw['location'] = randint(1, 69)
+        kw['status'] = 'free'
+        kw['code'] = 'wtf is that'
+        pb = Powerbank(capacity=randint(1, 99999), location=randint(1, 69), status='free', code='wtf is that')
+        print(pb)
+        pb.save()
+
+
 def index(request):
     show_notification = False
     global free_counted, remaining_started
     if not free_counted:
-        recount_free()
+        #recount_free()
         free_counted = True
     if not remaining_started:
         check_reservations()
@@ -405,6 +431,16 @@ def ordering(request, pk):
         return unverified(request)
     share = Share.objects.get(id=pk)
     ctx = { "location" : share.address }
+    ctx["small"] = False
+    ctx["medium"] = False
+    ctx["large"] = False
+    for pb in Powerbank.objects.filter(location=share.id):
+        if pb.capacity < 2500:
+            ctx["small"] = True
+        if 2500 <= pb.capacity < 7000:
+            ctx["medium"] = True
+        if pb.capacity >= 7000:
+            ctx["large"] = True
     ctx["pk"] = pk
     if request.method == 'POST':
         order_type = request.POST.get('order_type')
@@ -441,6 +477,7 @@ def pending(request):
         return redirect('/')
     ctx = {}
     ctx['remaining'] = int(remaining_min(order))
+    ctx['address'] = order.share.address
     return render(request, 'scan/pending.html', context=ctx)
         
         
@@ -488,6 +525,15 @@ def display_orders(request):
     orders = Order.objects.filter(profile=get_profile(request.user))
     ctx = { 'orders': orders }
     return render(request, 'debug/orders.html', ctx)
+
+
+@login_required
+def seed(request):
+    if not request.user.is_superuser:
+        return redirect('/error/rights')
+    seed_points()
+    seed_pbs()
+    return redirect('/')
 
 
 def contacts(request):
