@@ -13,6 +13,7 @@ from django.core import serializers
 from background_task import background
 from random import random, randint
 import datetime
+import requests
 
 free_counted = False
 remaining_started = False
@@ -141,7 +142,7 @@ def add_powerbank_sharing(request):
         qrcode = request.POST.get('qrcode')
         ip = request.POST.get('ip')
         crds = json.loads(request.POST.get('crds'))
-        new_sharing = Share(title=title, address=address, crds_lot=crds[0], crds_lat=crds[1], qrcode=qrcode)
+        new_sharing = Share(title=title, address=address, crds_lot=crds[0], crds_lat=crds[1], qrcode=qrcode, ip=ip)
         new_sharing.save()
         return HttpResponse('Новая точка выдачи успешно добавлена!')
     context = {}
@@ -417,10 +418,10 @@ def session(request):
         Обработка начала/конца сессии -- выдача пб, валидация сессии, прочее
     """
     if pb.status == 'ordered':
-        # eject
+        ejreq = requests.get('http://' + order.share.ip + '/')
         pb.status = 'occupied'
     else:
-        # eject
+        ejreq = requests.get('http://' + order.share.ip + '/')
         pb.status = 'charging'
     pb.save()
     return render(request, 'scan/session.html', {'session_status' : pb.status})
@@ -490,6 +491,7 @@ def ordering(request, pk):
                 ctx['order_status'] = 'fail'
                 # не найдено (но такого не будет)
     return render(request, 'sharing/order.html', context=ctx)
+
 
 @login_required
 def pending(request):
