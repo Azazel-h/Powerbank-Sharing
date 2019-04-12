@@ -10,7 +10,7 @@ from django.template import RequestContext
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
-#from background_task import background
+from background_task import background
 from random import random, randint
 import datetime
 
@@ -51,8 +51,6 @@ def get_last_order(profile):
 def remaining_min(order):
     if order.progress != 'created':
         return None
-    if order.order_type == 'immediate':
-        return None
     when_ordered = order.timestamp
     deadline = when_ordered + datetime.timedelta(minutes=order.reservation_time)
     now = datetime.datetime.now(datetime.timezone.utc)
@@ -70,7 +68,7 @@ def fail_order(order):
     order.save()
 
 
-#@background(schedule=60)
+@background(schedule=60)
 def check_reservations():
     profiles = Profile.objects.all()
     for pr in profiles:
@@ -107,6 +105,7 @@ def seed_pbs():
 
 
 def index(request):
+    rem = 0
     show_notification = False
     global free_counted, remaining_started
     if not free_counted:
@@ -122,7 +121,13 @@ def index(request):
         order = get_last_order(get_profile(request.user))
         if order.progress == 'created':
             show_notification = True
-    return render(request, 'index.html', {'sharings': Share.get_all(), 'pb': Powerbank.get_all(), 'show_notification': show_notification})
+            rem = remaining_min(order)
+            if rem < 0:
+                fail_order(order)
+                show_notification = False
+            else:
+                rem = int(rem)
+    return render(request, 'index.html', {'sharings': Share.get_all(), 'pb': Powerbank.get_all(), 'show_notification': show_notification, 'remaining': rem})
 
 
 @login_required
@@ -371,9 +376,10 @@ def signup(request):
 def scan(request):
     profile = get_profile(request.user)
     order = get_last_order(profile)
-    print(order.progress)
     if not profile.active_mail or profile.passport_status != 'success':
         return unverified(request)
+    if order.progress != 'created':
+        return redirect('/')
     if request.method == 'POST':
         scanned_code = request.POST.get('qrcode')
         if order.progress == 'created': # Если пользователь заказал зараннее
@@ -434,33 +440,55 @@ def ordering(request, pk):
     ctx["small"] = False
     ctx["medium"] = False
     ctx["large"] = False
-    for pb in Powerbank.objects.filter(location=share.id):
-        if pb.capacity < 2500:
+    for pb in Powerbank.objects.filter(location=share.id, status='free'):
+        if pb.capacity <= 4000:
             ctx["small"] = True
-        if 2500 <= pb.capacity < 7000:
+        if 4001 <= pb.capacity <= 10000:
             ctx["medium"] = True
-        if pb.capacity >= 7000:
+        if pb.capacity >= 10001:
             ctx["large"] = True
     ctx["pk"] = pk
     if request.method == 'POST':
         order_type = request.POST.get('order_type')
         pb_capacity = request.POST.get('pb_capacity')
-        cand = Powerbank.objects.all().filter(location=pk, capacity=pb_capacity, status='free')[0]
-        if cand != None:
-            if order_type == 'N':
-                order = Order(order_type='immediate', pb=cand, share=share, profile=get_profile(request.user))
+        if order_type != None and pb_capacity != None:
+            cands = Powerbank.objects.all().filter(location=pk, status='free')
+            cand = None
+            if pb_capacity == 'small': # находим максимальный до 4000
+                mx_cand = 0
+                for pb in cands:
+                    if pb.capacity > mx_cand and pb.capacity <= 4000:
+                        mx_cand = pb.capacity
+                        cand = pb
+            elif pb_capacity == 'medium': # находим максимальный от 4001 до 10000
+                mx_cand = 0
+                for pb in cands:
+                    if pb.capacity > mx_cand and 4001 <= pb.capacity <= 10000:
+                        mx_cand = pb.capacity
+                        cand = pb
+            elif pb_capacity == 'large': # находим самый максимальный
+                mx_cand = 0
+                for pb in cands:
+                    if pb.capacity > mx_cand:
+                        mx_cand = pb.capacity
+                        cand = pb
             else:
-                order = Order(order_type='hold', pb=cand, share=share, profile=get_profile(request.user))
-            order.save()
-            cand.status = 'ordered'
-            # когда юзер отсканит, тогда cand.status = 'occupied'
-            share.free_pbs -= 1
-            share.save()
-            cand.save()
-            ctx['order_status'] = 'succeess'
-        else:
-            ctx['order_status'] = 'fail'
-            # не найдено (но такого не будет)
+                pass
+            if cand != None:
+                if order_type == 'N':
+                    order = Order(order_type='immediate', pb=cand, share=share, profile=get_profile(request.user), reservation_time=2)
+                else:
+                    order = Order(order_type='hold', pb=cand, share=share, profile=get_profile(request.user))
+                order.save()
+                cand.status = 'ordered'
+                # когда юзер отсканит, тогда cand.status = 'occupied'
+                share.free_pbs -= 1
+                share.save()
+                cand.save()
+                ctx['order_status'] = 'succeess'
+            else:
+                ctx['order_status'] = 'fail'
+                # не найдено (но такого не будет)
     return render(request, 'sharing/order.html', context=ctx)
 
 @login_required
@@ -488,8 +516,14 @@ def cancelled(request):
     order = orders[last]
     if order.progress != 'created':
         return redirect('/')
+    pb = order.pb
+    share = order.share
+    pb.status = 'free'
+    pb.save()
     order.progress = 'cancelled'
     order.save()
+    share.free_pbs += 1
+    share.save()
     return render(request, 'scan/cancelled.html')
 
 """

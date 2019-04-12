@@ -18,7 +18,7 @@
 
     {% if show_notification %}
     <div class="alert alert-primary" role="alert">
-        Да ты поторопись! У нас сейчас обед, <a href="{% url 'pending' %}" class="alert-link">котлетки</a>! <a href="{% url 'scan' %}" class="alert-link">С макарошкой?</a> <a href="{% url 'cancelled' %}" class="alert-link">С пюрешкой, с пюрешкой!</a> 
+        Да ты поторопись! У нас через {{ remaining }} минут обед, <a href="{% url 'pending' %}" class="alert-link">котлетки</a>! <a href="{% url 'scan' %}" class="alert-link">С макарошкой?</a> <a href="{% url 'cancelled' %}" class="alert-link">С пюрешкой, с пюрешкой!</a> 
     </div>
     {% endif %}
     <div id="YMapsID" style="height: 100%; width: 100%;"></div>

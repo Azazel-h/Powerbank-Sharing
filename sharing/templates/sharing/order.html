@@ -27,14 +27,14 @@
 {#                 <form>#}
                         <div class="form-row">
                             <label for="order_type">Когда вам нужен Powerbank?</label>
-                            <div class=" col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
-                                 <label class="btn btn-secondary active">
-                                    <input type="radio" name="order_type" id="ord1" autocomplete="off" checked> Сейчас
-                                 </label>
-                                 <label class="btn btn-secondary active">
-                                    <input type="radio" name="order_type" id="ord2" autocomplete="off"> Через 15 минут
-                                 </label>
-                            </div>
+                            <div class="col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
+                                <label class="btn btn-secondary active">
+                                  <input type="radio" value="N" id="order_type" autocomplete="off"> Сейчас
+                                </label>
+                                <label class="btn btn-secondary">
+                                  <input type="radio" value="L" id="order_type" autocomplete="off"> Через 15 минут
+                                </label>
+                              </div>
                                  <!--<input type="text" id="order_type" class="form-control" placeholder="N"
                                         required>-->
 
@@ -42,23 +42,29 @@
                                  <label for="pb_capacity">Требуемая ёмкость аккумулятора</label>
                                 <div class=" col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
                                     {% if small %}
-                                    <label class="btn btn-secondary active">
-                                        <input type="radio" name="pb_type" id="ord1" autocomplete="off" checked> Маленькая
+                                    <label class="btn btn-secondary">
+                                        <input type="radio" value="small" id="pb_capacity" autocomplete="off"> Маленькая
+                                        <br>
+                                        <small>до 4000 mAh</small>
                                     </label>
                                     {% endif %}
                                     {% if medium %}
-                                    <label class="btn btn-secondary active">
-                                        <input type="radio" name="pb_type" id="ord1" autocomplete="off" checked> Средняя
+                                    <label class="btn btn-secondary">
+                                        <input type="radio" value="medium" id="pb_capacity" autocomplete="off"> Средняя
+                                        <br>
+                                        <small>от 4001 до 10000 mAh</small>
                                     </label>
                                     {% endif %}
                                     {% if large %}
-                                    <label class="btn btn-secondary active">
-                                        <input type="radio" name="pb_type" id="ord1" autocomplete="off" checked> Большая
+                                    <label class="btn btn-secondary">
+                                        <input type="radio" value="large" id="pb_capacity" autocomplete="off"> Большая
+                                        <br>
+                                        <small>от 10001 mAh</small>
                                     </label>
                                     {% endif %}
                                 </div>
-                                 <input type="text" id="pb_capacity" class="form-control"
-                                        placeholder="4000" required>
+                                 <!--<input type="text" id="pb_capacity" class="form-control"
+                                        placeholder="4000" required>-->
                              </div>
                         </div>
 
@@ -72,8 +78,8 @@
 
     <script>
         function get_info() {
-            var pb_capacity = $('#pb_capacity').val();
-            var order_type = $('#order_type').val();
+            var pb_capacity = $('#pb_capacity:checked').val();
+            var order_type = $('#order_type:checked').val();
             send(order_type, pb_capacity)
         }
 
@@ -86,14 +92,21 @@
                     pb_capacity: pb_capacity,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
-                success: function (response) {
-                    if (order_type === "N")
+                success: function (response){
+                    if (pb_capacity == undefined || order_type == undefined)
                     {
-                        window.location.href = "../../scan"
+                        alert("Заполните все поля!")
                     }
                     else
                     {
-                        window.location.href = "../../pending"
+                        if (order_type === "N")
+                        {
+                            window.location.href = "../../scan"
+                        }
+                        else if (order_type === "L")
+                        {
+                            window.location.href = "../../pending"
+                        }
                     }
                 }
             })
