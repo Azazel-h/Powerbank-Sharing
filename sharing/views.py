@@ -506,6 +506,8 @@ def pending(request):
     if order.progress != 'created':
         return redirect('/')
     ctx = {}
+    ctx['capacity'] = str(order.pb.capacity)
+    ctx['timestamp'] = str(order.timestamp)
     ctx['remaining'] = int(remaining_min(order))
     ctx['address'] = order.share.address
     return render(request, 'scan/pending.html', context=ctx)
