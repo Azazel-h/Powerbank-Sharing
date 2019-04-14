@@ -2,6 +2,23 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Powerbank(models.Model):
+    """
+    status: free     - заряжен и готов к использованию
+            ordered  - забронирован, но не используется
+            occupied - используется кем-то
+            charging - заряжается
+    """
+    code = models.CharField(max_length=256)
+    capacity = models.IntegerField()
+    location = models.IntegerField()
+    status = models.CharField(max_length=256)
+
+    @staticmethod
+    def get_all():
+        return Powerbank.objects.all()
+
+
 class Profile(models.Model):
     """
     passport_status: empty - фотография еще не отправлена (значение по умолчанию)
@@ -21,7 +38,8 @@ class Profile(models.Model):
     photo = models.FileField(upload_to='users/')
     passport = models.FileField(upload_to='passports/')
     passport_status = models.CharField(max_length=216, default='empty')
-    session_status = models.CharField(max_length=256, default='inactive')
+
+    hold = models.ForeignKey(Powerbank, on_delete=models.SET_NULL, null=True)
 
     @staticmethod
     def get_progress_complete_account(user):
@@ -48,18 +66,30 @@ class Share(models.Model):
     time = models.TimeField(auto_now_add=True)
     qrcode = models.CharField(max_length=512, default='Hello, world!')
     ip = models.CharField(max_length=256, default='127.0.0.1')
+    free_pbs = models.IntegerField(default=False)
 
     @staticmethod
     def get_all():
         return Share.objects.all()
 
+class Order(models.Model):
+    """
+    order_type: hold  - отложенный заказ (бронирование)
+                immediate - немедленный заказ (получить пб прямо сейчас)
 
-class Powerbank(models.Model):
-    code = models.CharField(max_length=256)
-    value = models.IntegerField()
-    location = models.IntegerField()
-    status = models.CharField(max_length=256)
+    progress: created - заказ только что сделан
+              applied - заказ выполняется (пб у юзера)
+              cancelled - заказ отменен
+              blocked - заказ заблокирован
+              failed - заказ провален (истекло время брони)
+              ended - заказ завершен
 
-    @staticmethod
-    def get_all():
-        return Powerbank.objects.all()
+    reservation_time: время бронирования в минутах
+    """
+    share = models.ForeignKey(Share, on_delete=models.SET_NULL, null=True)
+    pb = models.ForeignKey(Powerbank, on_delete=models.SET_NULL, null=True)
+    order_type = models.CharField(max_length=128, default='hold')
+    timestamp = models.DateTimeField(auto_now_add=True)
+    profile = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True)
+    progress = models.CharField(max_length=128, default='created')
+    reservation_time = models.IntegerField(default=15)

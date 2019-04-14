@@ -22,8 +22,8 @@
                              </div>
 
                              <div class="form-group col-md-6">
-                                 <label for="value">Емкость аккумулятора (mAh)</label>
-                                 <input type="text" id="value" class="form-control"
+                                 <label for="capacity">Емкость аккумулятора (mAh)</label>
+                                 <input type="text" id="capacity" class="form-control"
                                         placeholder="4000" required>
                              </div>
                         </div>
@@ -38,18 +38,18 @@
 
     <script>
         function get_info() {
-            var value = $('#value').val();
+            var capacity = $('#capacity').val();
             var location = $('#location').val();
-            send(location, value)
+            send(location, capacity)
         }
 
-        function send(location, value) {
+        function send(location, capacity) {
             $.ajax({
                 type: "POST",
                 url: "/sharing/add_pb",
                 data:{
                     location, location,
-                    value: value,
+                    capacity: capacity,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function (response) {

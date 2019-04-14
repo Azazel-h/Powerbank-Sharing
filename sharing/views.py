@@ -5,13 +5,18 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 import json
-from sharing.models import Share, Profile, Powerbank
+from sharing.models import Share, Profile, Powerbank, Order
 from django.template import RequestContext
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
-from random import random
+from background_task import background
+from random import random, randint
+import datetime
+import requests
 
+free_counted = False
+remaining_started = False
 
 def powerbank_percentage():
     free = len(Powerbank.objects.filter(status='free'))
@@ -21,15 +26,111 @@ def powerbank_percentage():
     return free * 100 // total
 
 
+def get_profile(user):
+    return Profile.objects.get(user=user)
+
+
+def recount_free():
+    shares = Share.get_all()
+    for sh in shares:
+        sh.free_pbs = 0
+        sh.save()
+    pbs = Powerbank.objects.filter(status='free')
+    for item in pbs:
+        share = Share.objects.get(id=item.location)
+        share.free_pbs += 1
+        share.save()
+
+
+def get_last_order(profile):
+    orders = Order.objects.filter(profile=profile)
+    if len(orders) == 0:
+        return Order(progress='failed')
+    return orders[len(orders) - 1]
+
+
+def remaining_min(order):
+    if order.progress != 'created':
+        return None
+    when_ordered = order.timestamp
+    deadline = when_ordered + datetime.timedelta(minutes=order.reservation_time)
+    now = datetime.datetime.now(datetime.timezone.utc)
+    return (deadline - now).total_seconds() / 60.0
+
+
+def fail_order(order):
+    order.progress = 'failed'
+    pb = order.pb
+    share = order.share
+    share.free_pbs += 1
+    pb.status = 'free'
+    share.save()
+    pb.save()
+    order.save()
+
+
+@background(schedule=60)
+def check_reservations():
+    profiles = Profile.objects.all()
+    for pr in profiles:
+        rem = remaining_min(get_last_order(pr))
+        if rem != None:
+            if rem <= 0:
+                fail_order(get_last_order(pr))
+
+
+def seed_points():
+    for i in range(120):
+        kw = {}
+        kw['title'] = 'seed'
+        kw['address'] = 'seed'
+        kw['crds_lot'] = float(randint(10, 110))
+        kw['crds_lat'] = float(randint(10, 110))
+        kw['qrcode'] = '777777'
+        kw['free_pbs'] = 0
+        share = Share(title='seed', address='seed', crds_lot=float(randint(10, 110)), crds_lat=float(randint(10, 110)), qrcode='777777', free_pbs=0)
+        print(share)
+        share.save()
+
+
+def seed_pbs():
+    for i in range(120):
+        kw = {}
+        kw['capacity'] = randint(1, 99999)
+        kw['location'] = randint(1, 69)
+        kw['status'] = 'free'
+        kw['code'] = 'wtf is that'
+        pb = Powerbank(capacity=randint(1, 99999), location=randint(1, 69), status='free', code='wtf is that')
+        print(pb)
+        pb.save()
+
+
 def index(request):
+    rem = 0
+    show_notification = False
+    global free_counted, remaining_started
+    if not free_counted:
+        #recount_free()
+        free_counted = True
+    if not remaining_started:
+        check_reservations()
+        remaining_started = True
     if request.user.is_authenticated:
         if not Profile.objects.filter(user=request.user).exists():
             new_profile = Profile(user=request.user)
             new_profile.save()
-    return render(request, 'index.html', {'sharings': Share.get_all()})
+        order = get_last_order(get_profile(request.user))
+        if order.progress == 'created':
+            show_notification = True
+            rem = remaining_min(order)
+            if rem < 0:
+                fail_order(order)
+                show_notification = False
+            else:
+                rem = int(rem)
+    return render(request, 'index.html', {'sharings': Share.get_all(), 'pb': Powerbank.get_all(), 'show_notification': show_notification, 'remaining': rem})
 
 
-# Добавить организацию
 @login_required
 def add_powerbank_sharing(request):
     if request.user.is_superuser is False:
@@ -41,7 +142,7 @@ def add_powerbank_sharing(request):
         qrcode = request.POST.get('qrcode')
         ip = request.POST.get('ip')
         crds = json.loads(request.POST.get('crds'))
-        new_sharing = Share(title=title, address=address, crds_lot=crds[0], crds_lat=crds[1], qrcode=qrcode)
+        new_sharing = Share(title=title, address=address, crds_lot=crds[0], crds_lat=crds[1], qrcode=qrcode, ip=ip)
         new_sharing.save()
         return HttpResponse('Новая точка выдачи успешно добавлена!')
     context = {}
@@ -55,8 +156,11 @@ def add_pb(request):
     if request.method == 'POST':
         code = random()
         location = request.POST.get('location')
-        value = request.POST.get('value')
-        new_pb = Powerbank(code=code, location=location, value=value, status='free')
+        capacity = request.POST.get('capacity')
+        new_pb = Powerbank(code=code, location=location, capacity=capacity, status='free')
+        share = Share.objects.get(id=location)
+        share.free_pbs += 1
+        share.save()
         new_pb.save()
         return HttpResponse('Новый powerbank успешно добавлен!')
     context = {}
@@ -64,9 +168,25 @@ def add_pb(request):
 
 @login_required
 def share_page(request, pk):
+    pbs = Powerbank.objects.filter(location=pk, status='free')
+    pb_size = len(pbs)
+    if pb_size == 0:
+        min_cap = max_cap = 0
+    elif pb_size == 1:
+        min_cap = max_cap = pbs[0].capacity
+    else:
+        min_cap = pbs[0].capacity
+        max_cap = pbs[1].capacity
+        for pb in pbs:
+            if pb.capacity > max_cap:
+                max_cap = pb.capacity
+            if pb.capacity < min_cap:
+                min_cap = pb.capacity
     context = {
         'share': Share.objects.get(id=pk),
-        'pb': Powerbank.objects.filter(location=pk)
+        'min_cap' : min_cap,
+        'max_cap' : max_cap,
+        'amt' : pb_size
     }
     return render(request, 'sharing/share_page.html', context)
 
@@ -250,24 +370,29 @@ def signup(request):
 
 
 """
-Разные страницы
+Сканирование кода
 """
 
 @login_required
 def scan(request):
-    profile = Profile.objects.get(user=request.user)
+    profile = get_profile(request.user)
+    order = get_last_order(profile)
     if not profile.active_mail or profile.passport_status != 'success':
         return unverified(request)
+    if order.progress != 'created':
+        return redirect('/')
     if request.method == 'POST':
         scanned_code = request.POST.get('qrcode')
-        for share in Share.get_all():
-            if share.qrcode == scanned_code:
-                if profile.session_status == 'inactive':
-                    profile.session_status = 'on_begin'
-                if profile.session_status == 'active':
-                    profile.session_status = 'on_end'
-                profile.save()
-                return render(request, 'scan/session.html')
+        if order.progress == 'created': # Если пользователь заказал зараннее
+            if order.share.qrcode == scanned_code:
+                order.progress = 'applied'
+                order.save()
+            return render(request, 'scan/session.html')
+        else:
+            '''
+                energo Pro - мнговенный заказ пб без бронирования
+            '''
+            pass
     else:
         return render(request, 'scan/scan.html')
 
@@ -285,28 +410,167 @@ def unverified(request):
 @login_required
 def session(request):
     profile = Profile.objects.get(user=request.user)
-    if not (profile.session_status == 'on_begin' or profile.session_status == 'on_end'):
+    order = get_last_order(profile)
+    pb = order.pb
+    if not order.progress == 'applied':
         return redirect('/')
     """
         Обработка начала/конца сессии -- выдача пб, валидация сессии, прочее
     """
-    if profile.session_status == 'on_begin':
-        profile.session_status = 'active'
+    if pb.status == 'ordered':
+        ejreq = requests.get('http://' + order.share.ip + '/')
+        pb.status = 'occupied'
     else:
-        profile.session_status = 'inactive'
-    profile.save()
-    return render(request, 'scan/session.html', {'session_status' : profile.session_status})
+        ejreq = requests.get('http://' + order.share.ip + '/')
+        pb.status = 'charging'
+    pb.save()
+    return render(request, 'scan/session.html', {'session_status' : pb.status})
+
+
+"""
+Заказ PB
+"""
+
+@login_required
+def ordering(request, pk):
+    profile = get_profile(request.user)
+    if not profile.active_mail or profile.passport_status != 'success':
+        return unverified(request)
+    share = Share.objects.get(id=pk)
+    ctx = { "location" : share.address }
+    ctx["small"] = False
+    ctx["medium"] = False
+    ctx["large"] = False
+    for pb in Powerbank.objects.filter(location=share.id, status='free'):
+        if pb.capacity <= 4000:
+            ctx["small"] = True
+        if 4001 <= pb.capacity <= 10000:
+            ctx["medium"] = True
+        if pb.capacity >= 10001:
+            ctx["large"] = True
+    ctx["pk"] = pk
+    if request.method == 'POST':
+        order_type = request.POST.get('order_type')
+        pb_capacity = request.POST.get('pb_capacity')
+        if order_type != None and pb_capacity != None:
+            cands = Powerbank.objects.all().filter(location=pk, status='free')
+            cand = None
+            if pb_capacity == 'small': # находим максимальный до 4000
+                mx_cand = 0
+                for pb in cands:
+                    if pb.capacity > mx_cand and pb.capacity <= 4000:
+                        mx_cand = pb.capacity
+                        cand = pb
+            elif pb_capacity == 'medium': # находим максимальный от 4001 до 10000
+                mx_cand = 0
+                for pb in cands:
+                    if pb.capacity > mx_cand and 4001 <= pb.capacity <= 10000:
+                        mx_cand = pb.capacity
+                        cand = pb
+            elif pb_capacity == 'large': # находим самый максимальный
+                mx_cand = 0
+                for pb in cands:
+                    if pb.capacity > mx_cand:
+                        mx_cand = pb.capacity
+                        cand = pb
+            else:
+                pass
+            if cand != None:
+                if order_type == 'N':
+                    order = Order(order_type='immediate', pb=cand, share=share, profile=get_profile(request.user), reservation_time=2)
+                else:
+                    order = Order(order_type='hold', pb=cand, share=share, profile=get_profile(request.user))
+                order.save()
+                cand.status = 'ordered'
+                # когда юзер отсканит, тогда cand.status = 'occupied'
+                share.free_pbs -= 1
+                share.save()
+                cand.save()
+                ctx['order_status'] = 'succeess'
+            else:
+                ctx['order_status'] = 'fail'
+                # не найдено (но такого не будет)
+    return render(request, 'sharing/order.html', context=ctx)
 
 
 @login_required
+def pending(request):
+    profile = get_profile(request.user)
+    if not profile.active_mail or profile.passport_status != 'success':
+        return unverified(request)
+    order = get_last_order(get_profile(request.user))
+    rem = remaining_min(order)
+    if rem != None:
+        if rem <= 0:
+            fail_order(order)
+    if order.progress != 'created':
+        return redirect('/')
+    ctx = {}
+    ctx['remaining'] = int(remaining_min(order))
+    ctx['address'] = order.share.address
+    return render(request, 'scan/pending.html', context=ctx)
+        
+        
+@login_required
+def cancelled(request):
+    orders = Order.objects.filter(profile=get_profile(request.user))
+    last = len(orders) - 1
+    order = orders[last]
+    if order.progress != 'created':
+        return redirect('/')
+    pb = order.pb
+    share = order.share
+    pb.status = 'free'
+    pb.save()
+    order.progress = 'cancelled'
+    order.save()
+    share.free_pbs += 1
+    share.save()
+    return render(request, 'scan/cancelled.html')
+
+"""
+Шаманство с правами пользователя
+"""
+
+@login_required
 def make_verified(request):
+    if not request.user.is_superuser:
+        return redirect('/error/rights')
     profile = Profile.objects.get(user=request.user)
     profile.passport_status = 'success'
     profile.session_status = 'inactive'
     profile.active_mail = True
-    profile.name = 'Sbeve'
+    profile.name = 'Sbeve Sbeve'
     profile.save()
     return redirect('/')
+
+
+@login_required
+def display_points(request):
+    if not request.user.is_superuser:
+        return redirect('/error/rights')
+    points = Share.get_all()
+    ctx = { 'pts': points }
+    return render(request, 'debug/display.html', ctx)
+
+
+@login_required
+def display_orders(request):
+    if not request.user.is_superuser:
+        return redirect('/error/rights')
+    orders = Order.objects.filter(profile=get_profile(request.user))
+    ctx = { 'orders': orders }
+    return render(request, 'debug/orders.html', ctx)
+
+
+@login_required
+def seed(request):
+    if not request.user.is_superuser:
+        return redirect('/error/rights')
+    seed_points()
+    seed_pbs()
+    return redirect('/')
+
 
 def contacts(request):
     return render(request, 'contacts.html', {})

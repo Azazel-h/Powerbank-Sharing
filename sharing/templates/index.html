@@ -15,6 +15,12 @@
         }
     </style>
     {% block br %} {% endblock %}
+
+    {% if show_notification %}
+    <div class="alert alert-primary" role="alert">
+        Да ты поторопись! У нас через {{ remaining }} минут обед, <a href="{% url 'pending' %}" class="alert-link">котлетки</a>! <a href="{% url 'scan' %}" class="alert-link">С макарошкой?</a> <a href="{% url 'cancelled' %}" class="alert-link">С пюрешкой, с пюрешкой!</a> 
+    </div>
+    {% endif %}
     <div id="YMapsID" style="height: 100%; width: 100%;"></div>
 
     {#  На релиз надо спрятать весь скрипт в один файл  #}
@@ -40,17 +46,17 @@
                             {% if user.is_authenticated %}
                                 '<div class="card">\n' +
                                 '    <div class="card-body">\n' +
-                                '        <h4 class="card-title"><span class="text-secondary"> название |</span> {{  i.title }} </h4>\n' +
-                                '        <p>\n' +
-                                '            <span class="text-secondary"> адрес |</span> {{ i.address }}\n' +
-                                '        </p>\n' +
-                                    {% if user.is_superuser %}
-                                '        <a href="#" class="btn btn-success mb-1"> Изменить точку? </a>\n' +
-                                    {% else %}
-                                {#'        <a href="#" class="btn btn-success mb-1" onclick="buildRoute({{ i.id }})"> Проложить маршрут </a>\n' +#}
+                                        '<h6 class="card-title"><span class="text-secondary"><a href="{% url 'share_page' pk=i.id %}"> {{ i.address }} </a></h6>\n' +
+                                    {% if i.free_pbs <= 0 %}
+                                    '    <h4 class="card-title"><span class="text-secondary"> Недоступно </h4>\n' +
                                     {% endif %}
-                                '        <a href="{% url 'share_page' pk=i.id %}" class="btn btn-primary mb-1"> На страницу станции </a>\n' +
-                                '    </div>\n' +
+                                    {% if i.free_pbs > 0 %}
+                                '        <a href="{% url 'ordering' pk=i.id %}" class="btn btn-primary mb-1 btn-lg btn-block"> Получить Powerbank </a>\n' +
+                                    {% endif %}
+                                    {% if user.is_superuser %}
+                                '        <a href="#" class="btn btn-success mb-1 btn-sm btn-block"> Изменить точку </a>\n' +
+                                    {% endif %}
+                                    '</div>\n' +
                                 '</div>'
                             {% else %}
                                 '<div class="card">\n' +
@@ -63,7 +69,11 @@
                     }, {
                         iconLayout: 'default#image',
                         {% load static %}
+                        {% if i.free_pbs > 0 %}
                         iconImageHref: '{% static 'img/energo-point-t.png' %}'
+                        {% else %}
+                        iconImageHref: '{% static 'img/energo-point-u-t.png' %}'
+                        {% endif %}
                     });
                 myMap.geoObjects.add(myGeoObject);
             {% endfor %}
