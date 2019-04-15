@@ -50,7 +50,9 @@ urlpatterns = [
     path('debug/make_verified', views.make_verified, name='make_verified'),
     path('debug/display_points', views.display_points, name='display_points'),
     path('debug/display_orders', views.display_orders, name='display_orders'),
-    path('debug/seed', views.seed, name='seed')
+    path('debug/seed', views.seed, name='seed'),
+    
+    path('payment/add_payment_plan', views.add_payment_plan, name='add_payment_plan')
 ]
 
 if settings.DEBUG:

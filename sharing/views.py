@@ -5,7 +5,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 import json
-from sharing.models import Share, Profile, Powerbank, Order
+from sharing.models import Share, Profile, Powerbank, Order, PaymentPlan, Wallet
 from django.template import RequestContext
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -153,7 +153,7 @@ def add_powerbank_sharing(request):
 
 @login_required
 def add_pb(request):
-    if request.user.is_superuser is False:
+    if not request.user.is_superuser:
         return redirect('/')
 
     if request.method == 'POST':
@@ -166,8 +166,7 @@ def add_pb(request):
         share.save()
         new_pb.save()
         return HttpResponse('Новый powerbank успешно добавлен!')
-    context = {}
-    return render(request, 'sharing/add_pb.html', context)
+    return render(request, 'sharing/add_pb.html')
 
 @login_required
 def share_page(request, pk):
@@ -371,6 +370,23 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'registration/signup.html', {'form': form})
 
+"""
+Добавление тарифа
+"""
+
+@login_required
+def add_payment_plan(request):
+    if not request.user.is_superuser:
+        return redirect('/')    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        descrption = request.POST.get('descrption')
+        payment_type = request.POST.get('payment_type')
+        cost = request.POST.get('cost')
+        payment_plan = PaymentPlan(name=name, description=descrption, payment_type=payment_type, cost=cost)
+        payment_plan.save()
+        return HttpResponse('Новый тариф успешно добавлен!')
+    return render(request, 'payment/add_payment_plan.html')
 
 """
 Сканирование кода
@@ -455,6 +471,9 @@ def ordering(request, pk):
         if pb.capacity >= 10001:
             ctx["large"] = True
     ctx["pk"] = pk
+    ctx["plans"] = profile.payment_plans
+    ctx["wallets"] = profile.wallets
+
     if request.method == 'POST':
         order_type = request.POST.get('order_type')
         pb_capacity = request.POST.get('pb_capacity')
