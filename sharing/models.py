@@ -31,6 +31,9 @@ class Profile(models.Model):
                     active   - сессия активна
                     on_end   - скан кода произошел, сессия сейчас закончится
                     fail     - ошибка в процессе сессии
+
+    wallets: string, в котором перечислены id кошельков из модели Wallet
+    payment_plans: string, в котором перечислены id доступных планов оплаты из модели PaymentPlan
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=512,  null=True)
@@ -38,6 +41,8 @@ class Profile(models.Model):
     photo = models.FileField(upload_to='users/')
     passport = models.FileField(upload_to='passports/')
     passport_status = models.CharField(max_length=216, default='empty')
+    wallets = models.CharField(max_length=512, default='')
+    payment_plans = models.CharField(max_length=512, default='')
 
     hold = models.ForeignKey(Powerbank, on_delete=models.SET_NULL, null=True)
 
