@@ -371,7 +371,7 @@ def signup(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 """
-Добавление тарифа
+Добавление тарифа и метода оплаты
 """
 
 @login_required
@@ -387,6 +387,23 @@ def add_payment_plan(request):
         payment_plan.save()
         return HttpResponse('Новый тариф успешно добавлен!')
     return render(request, 'payment/add_payment_plan.html')
+
+
+@login_required
+def add_wallet(request):   
+    if request.method == 'POST':
+        payment_method = request.POST.get('payment_method')
+        balance = request.POST.get('balance')
+        wallet = Wallet(payment_method=payment_method, status='active', balance=balance)
+        profile = get_profile(request.user)
+        wallet.save()
+        wallet_str = profile.wallets
+        new_wallet_str = wallet_str + str(wallet.id) + ' '
+        profile.wallets = new_wallet_str
+        profile.save()
+        return HttpResponse('Новый кошелёк успешно добавлен!')
+    return render(request, 'payment/add_wallet.html')
+
 
 """
 Сканирование кода

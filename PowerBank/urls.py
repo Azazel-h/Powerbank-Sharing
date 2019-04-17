@@ -52,7 +52,8 @@ urlpatterns = [
     path('debug/display_orders', views.display_orders, name='display_orders'),
     path('debug/seed', views.seed, name='seed'),
     
-    path('payment/add_payment_plan', views.add_payment_plan, name='add_payment_plan')
+    path('payment/add_payment_plan', views.add_payment_plan, name='add_payment_plan'),
+    path('payment/add_wallet', views.add_wallet, name='add_wallet')
 ]
 
 if settings.DEBUG:

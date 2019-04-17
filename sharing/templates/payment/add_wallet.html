@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block add_sharing_tab %}<li class="nav-item active"><a class="nav-link" href="{% url 'add_sharing' %}"> Добавить кошелёк </a></li>{% endblock %}
+{% block title %} Добавить кошелёк {% endblock %}
+
+{% block content %}
+    <style>
+        body, html{
+            width: 100%;
+            height: 85%;
+        }
+    </style>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title"> Добавить кошелёк </h2>
+{#                 <form>#}
+                        <div class="form-row">
+                            <label for="payment_method">Тип кошелька</label>
+                            <div class="col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
+                                <!--
+                                    payment_method:
+                                    promo - деньги даны в подарок
+                                    banking - банковская карта
+                                    cash - наличные
+                                    crypto - крипта
+                                    other - другое (хммм)
+                                -->
+                                <label class="btn btn-primary">
+                                    <input type="radio" value="promo" id="payment_method" autocomplete="off"> Промоакция
+                                </label>
+                                <label class="btn btn-secondary">
+                                    <input type="radio" value="banking" id="payment_method" autocomplete="off"> Банковская карта
+                                </label>
+                                <label class="btn btn-secondary">
+                                    <input type="radio" value="cash" id="payment_method" autocomplete="off"> Наличные
+                                </label>
+                                <label class="btn btn-secondary">
+                                    <input type="radio" value="crypto" id="payment_method" autocomplete="off"> Криптовалюта
+                                </label>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="balance">Начальный баланс (гривны)</label>
+                                <input type="number" id="balance" class="form-control"
+                                        placeholder="0" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group text-center">
+                            <input type="submit" class="btn btn-lg btn-success" value="Добавить" onclick="get_info()">
+                        </div>
+{#                 </form>#}
+                </div>
+            </div>
+        </div>
+
+    <script>
+        function get_info() {
+            var balance = $('#balance').val();
+            var payment_method = $('#payment_method').val();
+            send(balance, payment_method)
+        }
+
+        function send(balance, payment_method) {
+            $.ajax({
+                type: "POST",
+                url: "/payment/add_wallet",
+                data:{
+                    payment_method, payment_method,
+                    balance: balance,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    alert(response);
+                }
+            })
+        }
+    </script>
+{% endblock %}
