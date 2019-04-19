@@ -14,6 +14,10 @@
                     <br>
                     <strong>Дата и время бронирования:</strong> {{ timestamp }}
                     <br>
+                    <strong>Тариф</strong> {{ plan }}
+                    <br>
+                    <strong>Средство оплаты:</strong> {{ wallet }}
+                    <br>
                     До окончания бронирования <strong>{{ remaining }}</strong> минут.
                 </p>
                 <a class="btn btn-primary btn-lg btn-block" href="{% url 'scan' %}">Забрать Powerbank</a>

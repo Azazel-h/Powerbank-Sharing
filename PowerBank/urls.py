@@ -51,6 +51,8 @@ urlpatterns = [
     path('debug/display_points', views.display_points, name='display_points'),
     path('debug/display_orders', views.display_orders, name='display_orders'),
     path('debug/seed', views.seed, name='seed'),
+    path('debug/display_plans', views.display_plans, name='display_plans'),
+    path('debug/reset_orders', views.reset_orders, name='reset_orders'),
     
     path('payment/add_payment_plan', views.add_payment_plan, name='add_payment_plan'),
     path('payment/add_wallet', views.add_wallet, name='add_wallet')
