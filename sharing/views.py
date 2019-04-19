@@ -392,9 +392,10 @@ def add_payment_plan(request):
 @login_required
 def add_wallet(request):   
     if request.method == 'POST':
+        name = request.POST.get('name')
         payment_method = request.POST.get('payment_method')
         balance = request.POST.get('balance')
-        wallet = Wallet(payment_method=payment_method, status='active', balance=balance)
+        wallet = Wallet(name=name, payment_method=payment_method, status='active', balance=balance)
         profile = get_profile(request.user)
         wallet.save()
         wallet_str = profile.wallets
@@ -448,6 +449,7 @@ def session(request):
     profile = Profile.objects.get(user=request.user)
     order = get_last_order(profile)
     pb = order.pb
+    ctx = {}
     if not order.progress == 'applied':
         return redirect('/')
     """
@@ -457,10 +459,15 @@ def session(request):
         ejreq = requests.get('http://' + order.share.ip + '/')
         # Начать оплату
         pb.status = 'occupied'
-    else:
+    elif pb.status == 'returning':
         ejreq = requests.get('http://' + order.share.ip + '/')
         # Конец оплаты
         pb.status = 'charging'
+    elif pb.status == 'occupied':
+        ctx['capacity'] = pb.capacity
+        ctx['timestamp'] = order.timestamp
+        ctx['payment_plan'] = order.payment_plan.name
+        ctx['wallet'] = order.wallet.name
     pb.save()
     # Текущая оплата...
     return render(request, 'scan/session.html', {'session_status' : pb.status})

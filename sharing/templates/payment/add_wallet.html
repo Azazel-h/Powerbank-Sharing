@@ -15,6 +15,11 @@
                 <h2 class="card-title"> Добавить кошелёк </h2>
 {#                 <form>#}
                         <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="name">Имя</label>
+                                <input type="text" id="name" class="form-control"
+                                                placeholder="Мой кошелёк" required>
+                            </div>
                             <label for="payment_method">Тип кошелька</label>
                             <div class="col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
                                 <!--
@@ -55,16 +60,18 @@
 
     <script>
         function get_info() {
+            var name = $('#name').val();
             var balance = $('#balance').val();
             var payment_method = $('#payment_method').val();
-            send(balance, payment_method)
+            send(name, balance, payment_method)
         }
 
-        function send(balance, payment_method) {
+        function send(name, balance, payment_method) {
             $.ajax({
                 type: "POST",
                 url: "/payment/add_wallet",
                 data:{
+                    name: name,
                     payment_method, payment_method,
                     balance: balance,
                     csrfmiddlewaretoken: '{{ csrf_token }}'

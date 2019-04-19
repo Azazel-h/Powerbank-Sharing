@@ -77,6 +77,34 @@ class Share(models.Model):
     def get_all():
         return Share.objects.all()
 
+class Wallet(models.Model):
+    """
+    status: active - кошелёк в нормальном состоянии
+            suspended - заморожен (есть задолженность, по её устранению кошелёк снова активен)
+            blocked - заблокирован (нельзя восстановить этот кошелёк)
+            infinite - бесконечный 
+
+    payment_method: promo - деньги даны в подарок
+                    banking - банковская карта
+                    cash - наличные
+                    crypto - крипта
+                    other - другое (хммм)
+    """
+    name = models.CharField(max_length=128, default='Кошелёк')
+    balance = models.FloatField(default=0.0)
+    status = models.CharField(max_length=128, default='active')
+    payment_method = models.CharField(max_length=128, default='promo')
+
+class PaymentPlan(models.Model):
+    """
+    payment_type: perminute - поминутная оплата
+                  instant - мгновенная
+    """
+    name = models.CharField(max_length=128, default='Обычный')
+    description = models.CharField(max_length=512, default='Самый обычный тариф.')
+    payment_type = models.CharField(max_length=128, default='perminute')
+    cost = models.FloatField(default=0.0)
+
 class Order(models.Model):
     """
     order_type: hold  - отложенный заказ (бронирование)
@@ -98,30 +126,5 @@ class Order(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True)
     progress = models.CharField(max_length=128, default='created')
     reservation_time = models.IntegerField(default=15)
-
-class Wallet(models.Model):
-    """
-    status: active - кошелёк в нормальном состоянии
-            suspended - заморожен (есть задолженность, по её устранению кошелёк снова активен)
-            blocked - заблокирован (нельзя восстановить этот кошелёк)
-            infinite - бесконечный 
-
-    payment_method: promo - деньги даны в подарок
-                    banking - банковская карта
-                    cash - наличные
-                    crypto - крипта
-                    other - другое (хммм)
-    """
-    balance = models.FloatField(default=0.0)
-    status = models.CharField(max_length=128, default='active')
-    payment_method = models.CharField(max_length=128, default='promo')
-
-class PaymentPlan(models.Model):
-    """
-    payment_type: perminute - поминутная оплата
-                  instant - мгновенная
-    """
-    name = models.CharField(max_length=128, default='Обычный')
-    description = models.CharField(max_length=512, default='Самый обычный тариф.')
-    payment_type = models.CharField(max_length=128, default='perminute')
-    cost = models.FloatField(default=0.0)
+    payment_plan = models.ForeignKey(PaymentPlan, on_delete=models.SET_NULL, null=True)
+    wallet = models.ForeignKey(Wallet, on_delete=models.SET_NULL, null=True)

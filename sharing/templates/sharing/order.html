@@ -36,10 +36,9 @@
                                 </label>
                             </div>
                                  <!--<input type="text" id="order_type" class="form-control" placeholder="N"
-                                        required>-->
-
-                             <div class="form-group col-md-6">
-                                 <label for="pb_capacity">Требуемая ёмкость аккумулятора</label>
+                                       required>-->
+                            <div class="form-group col-md-6">
+                                <label for="pb_capacity">Требуемая ёмкость аккумулятора</label>
                                 <div class=" col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
                                     {% if small %}
                                     <label class="btn btn-secondary">
@@ -63,9 +62,37 @@
                                     </label>
                                     {% endif %}
                                 </div>
-                                 <!--<input type="text" id="pb_capacity" class="form-control"
-                                        placeholder="4000" required>-->
-                             </div>
+                                <!--<input type="text" id="pb_capacity" class="form-control"
+                                       placeholder="4000" required>-->
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="pb_capacity">Тариф</label>
+                                <div class=" col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
+                                    {% for plan in plans %}
+                                    <label class="btn btn-secondary">
+                                        <input type="radio" value="{{ plan | id }}" id="plan" autocomplete="off"> {{ plan | name }}
+                                        <br>
+                                        <small>{{ plan | description }}</small>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                                <!--<input type="text" id="pb_capacity" class="form-control"
+                                   placeholder="4000" required>-->
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="pb_capacity">Кошелёк</label>
+                                <div class=" col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
+                                    {% for wallet in wallets %}
+                                    <label class="btn btn-secondary">
+                                        <input type="radio" value="{{ wallet | id }}" id="plan" autocomplete="off"> {{ wallet | name }}
+                                        <br>
+                                        <small>{{ wallet | balance }}</small>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                                <!--<input type="text" id="pb_capacity" class="form-control"
+                                   placeholder="4000" required>-->
+                            </div>
                         </div>
 
                         <div class="form-group text-center">
