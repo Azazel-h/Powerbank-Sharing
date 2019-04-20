@@ -31,11 +31,13 @@
             {% else %}
             Доступно {{ amt }} устройств ёмкостью от {{ min_cap }} mAh до {{ max_cap }} mAh.
             {% endif %}
+
+            {% if amt > 0 %}
             <a class="btn btn-primary" href="{% url 'ordering' pk=share.id %}">Забронировать...</a>
+            {% endif %}
 
             {% if user.is_superuser %}
-
-                <a class="btn btn-primary" href="{% url 'add_power_bank' %}" role="button"> Добавить информацию о powerbank'ах </a>
+                <a class="btn btn-warning" href="{% url 'add_power_bank' %}" role="button"> Добавить информацию о powerbank'ах </a>
             {% endif %}
         </div>
     </div>

@@ -5,12 +5,11 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 import json
-from sharing.models import Share, Profile, Powerbank, Order
+from sharing.models import Share, Profile, Powerbank, Order, PaymentPlan, Wallet
 from django.template import RequestContext
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
-from background_task import background
 from random import random, randint
 import datetime
 import requests
@@ -69,7 +68,6 @@ def fail_order(order):
     order.save()
 
 
-@background(schedule=60)
 def check_reservations():
     profiles = Profile.objects.all()
     for pr in profiles:
@@ -89,7 +87,6 @@ def seed_points():
         kw['qrcode'] = '777777'
         kw['free_pbs'] = 0
         share = Share(title='seed', address='seed', crds_lot=float(randint(10, 110)), crds_lat=float(randint(10, 110)), qrcode='777777', free_pbs=0)
-        print(share)
         share.save()
 
 
@@ -101,13 +98,28 @@ def seed_pbs():
         kw['status'] = 'free'
         kw['code'] = 'wtf is that'
         pb = Powerbank(capacity=randint(1, 99999), location=randint(1, 69), status='free', code='wtf is that')
-        print(pb)
         pb.save()
+
+
+def reset_sessions_and_orders():
+    active_sessions = Order.objects.filter(progress='applied')
+    for session in active_sessions:
+        fail_order(session)
+
+
+def count_profit(order):
+    if order.progress != 'applied':
+        return None
+    when_ordered = order.timestamp
+    now = datetime.datetime.now(datetime.timezone.utc)
+    cost = order.payment_plan.cost
+    return int((now - when_ordered).total_seconds() / 60.0 * cost)
 
 
 def index(request):
     rem = 0
-    show_notification = False
+    pending_notification = False
+    session_notification = False
     global free_counted, remaining_started
     if not free_counted:
         #recount_free()
@@ -121,14 +133,16 @@ def index(request):
             new_profile.save()
         order = get_last_order(get_profile(request.user))
         if order.progress == 'created':
-            show_notification = True
+            pending_notification = True
             rem = remaining_min(order)
             if rem < 0:
                 fail_order(order)
-                show_notification = False
+                pending_notification = False
             else:
                 rem = int(rem)
-    return render(request, 'index.html', {'sharings': Share.get_all(), 'pb': Powerbank.get_all(), 'show_notification': show_notification, 'remaining': rem})
+        elif order.progress == 'applied':
+            session_notification = True
+    return render(request, 'index.html', {'sharings': Share.get_all(), 'pb': Powerbank.get_all(), 'pending_notification': pending_notification, 'session_notification': session_notification, 'remaining': rem})
 
 
 @login_required
@@ -150,7 +164,7 @@ def add_powerbank_sharing(request):
 
 @login_required
 def add_pb(request):
-    if request.user.is_superuser is False:
+    if not request.user.is_superuser:
         return redirect('/')
 
     if request.method == 'POST':
@@ -163,8 +177,7 @@ def add_pb(request):
         share.save()
         new_pb.save()
         return HttpResponse('Новый powerbank успешно добавлен!')
-    context = {}
-    return render(request, 'sharing/add_pb.html', context)
+    return render(request, 'sharing/add_pb.html')
 
 @login_required
 def share_page(request, pk):
@@ -368,6 +381,41 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'registration/signup.html', {'form': form})
 
+"""
+Добавление тарифа и метода оплаты
+"""
+
+@login_required
+def add_payment_plan(request):
+    if not request.user.is_superuser:
+        return redirect('/')    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        payment_type = request.POST.get('payment_type')
+        cost = request.POST.get('cost')
+        payment_plan = PaymentPlan(name=name, description=description, payment_type=payment_type, cost=cost)
+        payment_plan.save()
+        return HttpResponse('Новый тариф успешно добавлен!')
+    return render(request, 'payment/add_payment_plan.html')
+
+
+@login_required
+def add_wallet(request):   
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        payment_method = request.POST.get('payment_method')
+        balance = request.POST.get('balance')
+        wallet = Wallet(name=name, payment_method=payment_method, status='active', balance=balance)
+        profile = get_profile(request.user)
+        wallet.save()
+        wallet_str = profile.wallets
+        new_wallet_str = wallet_str + str(wallet.id) + ' '
+        profile.wallets = new_wallet_str
+        profile.save()
+        return HttpResponse('Новый кошелёк успешно добавлен!')
+    return render(request, 'payment/add_wallet.html')
+
 
 """
 Сканирование кода
@@ -387,7 +435,7 @@ def scan(request):
             if order.share.qrcode == scanned_code:
                 order.progress = 'applied'
                 order.save()
-            return render(request, 'scan/session.html')
+                return render(request, 'scan/session.html')
         else:
             '''
                 energo Pro - мнговенный заказ пб без бронирования
@@ -412,6 +460,7 @@ def session(request):
     profile = Profile.objects.get(user=request.user)
     order = get_last_order(profile)
     pb = order.pb
+    ctx = {}
     if not order.progress == 'applied':
         return redirect('/')
     """
@@ -419,12 +468,21 @@ def session(request):
     """
     if pb.status == 'ordered':
         ejreq = requests.get('http://' + order.share.ip + '/')
+        # Начать оплату
         pb.status = 'occupied'
-    else:
+    elif pb.status == 'returning':
         ejreq = requests.get('http://' + order.share.ip + '/')
+        # Конец оплаты
         pb.status = 'charging'
+    elif pb.status == 'occupied':
+        ctx['to_pay'] = count_profit(order)
+        ctx['capacity'] = pb.capacity
+        ctx['timestamp'] = order.timestamp
+        ctx['payment_plan'] = order.payment_plan.name
+        ctx['wallet'] = order.wallet.name
     pb.save()
-    return render(request, 'scan/session.html', {'session_status' : pb.status})
+    # Текущая оплата...
+    return render(request, 'scan/session.html', ctx)
 
 
 """
@@ -436,6 +494,8 @@ def ordering(request, pk):
     profile = get_profile(request.user)
     if not profile.active_mail or profile.passport_status != 'success':
         return unverified(request)
+    if get_last_order(profile).progress == 'applied':
+        return redirect('/session')
     share = Share.objects.get(id=pk)
     ctx = { "location" : share.address }
     ctx["small"] = False
@@ -449,9 +509,20 @@ def ordering(request, pk):
         if pb.capacity >= 10001:
             ctx["large"] = True
     ctx["pk"] = pk
+    wallets_id = list(map(int, profile.wallets.split()))
+    wallets = []
+    for wid in wallets_id:
+        wallets.append(Wallet.objects.filter(id=wid)[0])
+    ctx["plans"] = PaymentPlan.objects.all()
+    ctx["wallets"] = wallets
+
     if request.method == 'POST':
         order_type = request.POST.get('order_type')
         pb_capacity = request.POST.get('pb_capacity')
+        payment_plan_id = request.POST.get('payment_plan')
+        wallet_id = request.POST.get('wallet')
+        payment_plan = PaymentPlan.objects.filter(id=payment_plan_id)[0]
+        wallet = Wallet.objects.filter(id=wallet_id)[0]
         if order_type != None and pb_capacity != None:
             cands = Powerbank.objects.all().filter(location=pk, status='free')
             cand = None
@@ -477,9 +548,9 @@ def ordering(request, pk):
                 pass
             if cand != None:
                 if order_type == 'N':
-                    order = Order(order_type='immediate', pb=cand, share=share, profile=get_profile(request.user), reservation_time=2)
+                    order = Order(wallet=wallet, payment_plan=payment_plan, order_type='immediate', pb=cand, share=share, profile=get_profile(request.user), reservation_time=2)
                 else:
-                    order = Order(order_type='hold', pb=cand, share=share, profile=get_profile(request.user))
+                    order = Order(wallet=wallet, payment_plan=payment_plan, order_type='hold', pb=cand, share=share, profile=get_profile(request.user))
                 order.save()
                 cand.status = 'ordered'
                 # когда юзер отсканит, тогда cand.status = 'occupied'
@@ -506,8 +577,12 @@ def pending(request):
     if order.progress != 'created':
         return redirect('/')
     ctx = {}
+    ctx['capacity'] = str(order.pb.capacity)
+    ctx['timestamp'] = str(order.timestamp)
     ctx['remaining'] = int(remaining_min(order))
     ctx['address'] = order.share.address
+    ctx['plan'] = order.payment_plan.name
+    ctx['wallet'] = order.wallet.name
     return render(request, 'scan/pending.html', context=ctx)
         
         
@@ -564,6 +639,23 @@ def display_orders(request):
 
 
 @login_required
+def display_plans(request):
+    if not request.user.is_superuser:
+        return redirect('/error/rights')
+    plans = PaymentPlan.objects.all()
+    ctx = { 'plans': plans }
+    return render(request, 'debug/plans.html', ctx)
+
+
+@login_required
+def reset_orders(request):
+    if not request.user.is_superuser:
+        return redirect('/error/rights')
+    reset_sessions_and_orders()
+    return redirect('/')
+
+
+@login_required
 def seed(request):
     if not request.user.is_superuser:
         return redirect('/error/rights')
@@ -578,7 +670,6 @@ def contacts(request):
 
 def error_rights(request):
     return render(request, 'error_rights.html')
-
 
 # def handler404(request, exception, template_name="404.html"):
 #     response = render_to_response("404.html")

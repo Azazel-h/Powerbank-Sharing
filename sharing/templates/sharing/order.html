@@ -26,20 +26,21 @@
                 <h4> {{ location }} </h4>
 {#                 <form>#}
                         <div class="form-row">
-                            <label for="order_type">Когда вам нужен Powerbank?</label>
-                            <div class="col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
-                                <label class="btn btn-secondary active">
-                                  <input type="radio" value="N" id="order_type" autocomplete="off"> Сейчас
-                                </label>
-                                <label class="btn btn-secondary">
-                                  <input type="radio" value="L" id="order_type" autocomplete="off"> Через 15 минут
-                                </label>
-                              </div>
+                            <div class="form-group col-md-6">
+                                <label for="order_type">Когда вам нужен Powerbank?</label>
+                                <div class="col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
+                                    <label class="btn btn-secondary">
+                                      <input type="radio" value="N" id="order_type" autocomplete="off"> Сейчас
+                                    </label>
+                                    <label class="btn btn-secondary">
+                                      <input type="radio" value="L" id="order_type" autocomplete="off"> Через 15 минут
+                                    </label>
+                                </div>
+                            </div>
                                  <!--<input type="text" id="order_type" class="form-control" placeholder="N"
-                                        required>-->
-
-                             <div class="form-group col-md-6">
-                                 <label for="pb_capacity">Требуемая ёмкость аккумулятора</label>
+                                       required>-->
+                            <div class="form-group col-md-6">
+                                <label for="pb_capacity">Требуемая ёмкость аккумулятора</label>
                                 <div class=" col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
                                     {% if small %}
                                     <label class="btn btn-secondary">
@@ -63,9 +64,37 @@
                                     </label>
                                     {% endif %}
                                 </div>
-                                 <!--<input type="text" id="pb_capacity" class="form-control"
-                                        placeholder="4000" required>-->
-                             </div>
+                                <!--<input type="text" id="pb_capacity" class="form-control"
+                                       placeholder="4000" required>-->
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="pb_capacity">Тариф</label>
+                                <div class=" col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
+                                    {% for plan in plans %}
+                                    <label class="btn btn-secondary">
+                                        <input type="radio" value="{{ plan.id }}" id="plan" autocomplete="off"> {{ plan.name }}
+                                        <br>
+                                        <small>{{ plan.description }}</small>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                                <!--<input type="text" id="pb_capacity" class="form-control"
+                                   placeholder="4000" required>-->
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="pb_capacity">Кошелёк</label>
+                                <div class=" col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
+                                    {% for wallet in wallets %}
+                                    <label class="btn btn-secondary">
+                                        <input type="radio" value="{{ wallet.id }}" id="wallet" autocomplete="off"> {{ wallet.name }}
+                                        <br>
+                                        <small>{{ wallet.balance }}₽</small>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                                <!--<input type="text" id="pb_capacity" class="form-control"
+                                   placeholder="4000" required>-->
+                            </div>
                         </div>
 
                         <div class="form-group text-center">
@@ -80,20 +109,24 @@
         function get_info() {
             var pb_capacity = $('#pb_capacity:checked').val();
             var order_type = $('#order_type:checked').val();
-            send(order_type, pb_capacity)
+            var payment_plan = $('#plan:checked').val();
+            var wallet = $('#wallet:checked').val();
+            send(order_type, pb_capacity, payment_plan, wallet)
         }
 
-        function send(order_type, pb_capacity) {
+        function send(order_type, pb_capacity, payment_plan, wallet) {
             $.ajax({
                 type: "POST",
                 url: "/order/{{ pk }}/",
                 data:{
                     order_type, order_type,
                     pb_capacity: pb_capacity,
+                    payment_plan: payment_plan,
+                    wallet, wallet,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function (response){
-                    if (pb_capacity == undefined || order_type == undefined)
+                    if (pb_capacity == undefined || order_type == undefined || payment_plan == undefined || wallet == undefined)
                     {
                         alert("Заполните все поля!")
                     }

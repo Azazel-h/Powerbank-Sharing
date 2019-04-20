@@ -31,6 +31,9 @@ class Profile(models.Model):
                     active   - сессия активна
                     on_end   - скан кода произошел, сессия сейчас закончится
                     fail     - ошибка в процессе сессии
+
+    wallets: string, в котором перечислены id кошельков из модели Wallet
+    payment_plans: string, в котором перечислены id доступных планов оплаты из модели PaymentPlan
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=512,  null=True)
@@ -38,6 +41,8 @@ class Profile(models.Model):
     photo = models.FileField(upload_to='users/')
     passport = models.FileField(upload_to='passports/')
     passport_status = models.CharField(max_length=216, default='empty')
+    wallets = models.CharField(max_length=512, default='')
+    payment_plans = models.CharField(max_length=512, default='')
 
     hold = models.ForeignKey(Powerbank, on_delete=models.SET_NULL, null=True)
 
@@ -72,6 +77,34 @@ class Share(models.Model):
     def get_all():
         return Share.objects.all()
 
+class Wallet(models.Model):
+    """
+    status: active - кошелёк в нормальном состоянии
+            suspended - заморожен (есть задолженность, по её устранению кошелёк снова активен)
+            blocked - заблокирован (нельзя восстановить этот кошелёк)
+            infinite - бесконечный 
+
+    payment_method: promo - деньги даны в подарок
+                    banking - банковская карта
+                    cash - наличные
+                    crypto - крипта
+                    other - другое (хммм)
+    """
+    name = models.CharField(max_length=128, default='Кошелёк')
+    balance = models.FloatField(default=0.0)
+    status = models.CharField(max_length=128, default='active')
+    payment_method = models.CharField(max_length=128, default='promo')
+
+class PaymentPlan(models.Model):
+    """
+    payment_type: perminute - поминутная оплата
+                  instant - мгновенная
+    """
+    name = models.CharField(max_length=128, default='Обычный')
+    description = models.CharField(max_length=512, default='Самый обычный тариф.')
+    payment_type = models.CharField(max_length=128, default='perminute')
+    cost = models.FloatField(default=0.0)
+
 class Order(models.Model):
     """
     order_type: hold  - отложенный заказ (бронирование)
@@ -93,3 +126,5 @@ class Order(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True)
     progress = models.CharField(max_length=128, default='created')
     reservation_time = models.IntegerField(default=15)
+    payment_plan = models.ForeignKey(PaymentPlan, on_delete=models.SET_NULL, null=True)
+    wallet = models.ForeignKey(Wallet, on_delete=models.SET_NULL, null=True)

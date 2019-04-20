@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %} DEBUG ZONE {% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% for item in plans %}
+        <h5>{{ item.name }}</h5>
+        {{ item.description }}
+        <br>
+        {{ item.id }}
+        <br>
+        {{ item.name }}
+        <br>
+        {{ item.description }}
+        <br>
+        {{ item.payment_type }}
+        <br>
+        {{ item.cost }}
+        <br>
+        <br>
+        {% endfor %}
+    </div>
+{% endblock %}

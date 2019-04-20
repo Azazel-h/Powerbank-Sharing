@@ -7,10 +7,18 @@
         <div class="card">
             <div class="card-body">
                 <h2 class="card-title text-center"> Вы забронировали Powerbank </h2>
-                <p class="text-center">
-                    Станция: {{ address }}
+                <p class="text-center text-monospace">
+                    <strong>Станция бронирования:</strong> {{ address }}
                     <br>
-                    До окончания бронирования {{ remaining }} минут.
+                    <strong>Ёмкость бронируемого устройства:</strong> {{ capacity }} mAh
+                    <br>
+                    <strong>Дата и время бронирования:</strong> {{ timestamp }}
+                    <br>
+                    <strong>Тариф</strong> {{ plan }}
+                    <br>
+                    <strong>Средство оплаты:</strong> {{ wallet }}
+                    <br>
+                    До окончания бронирования <strong>{{ remaining }}</strong> минут.
                 </p>
                 <a class="btn btn-primary btn-lg btn-block" href="{% url 'scan' %}">Забрать Powerbank</a>
                 <a class="btn btn-danger btn-lg btn-block" href="{% url 'cancelled' %}">Отменить бронирование</a>
