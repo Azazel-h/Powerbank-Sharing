@@ -10,7 +10,6 @@ from django.template import RequestContext
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
-#from background_task import background
 from random import random, randint
 import datetime
 import requests
@@ -69,7 +68,6 @@ def fail_order(order):
     order.save()
 
 
-#@background(schedule=60)
 def check_reservations():
     profiles = Profile.objects.all()
     for pr in profiles:
