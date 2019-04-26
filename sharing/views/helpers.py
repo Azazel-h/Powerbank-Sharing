@@ -42,7 +42,8 @@ def remaining_min(order):
     if order.progress != 'created':
         return None
     when_ordered = order.timestamp
-    deadline = when_ordered + datetime.timedelta(minutes=order.reservation_time)
+    deadline = when_ordered +
+    datetime.timedelta(minutes=order.reservation_time)
     now = datetime.datetime.now(datetime.timezone.utc)
     return (deadline - now).total_seconds() / 60.0
 
@@ -62,7 +63,7 @@ def check_reservations():
     profiles = Profile.objects.all()
     for pr in profiles:
         rem = remaining_min(get_last_order(pr))
-        if rem != None:
+        if rem is not None:
             if rem <= 0:
                 fail_order(get_last_order(pr))
 
@@ -76,7 +77,10 @@ def seed_points():
         kw['crds_lat'] = float(randint(10, 110))
         kw['qrcode'] = '777777'
         kw['free_pbs'] = 0
-        share = Share(title='seed', address='seed', crds_lot=float(randint(10, 110)), crds_lat=float(randint(10, 110)), qrcode='777777', free_pbs=0)
+        share = Share(title='seed', address='seed',
+                      crds_lot=float(randint(10, 110)),
+                      crds_lat=float(randint(10, 110)),
+                      qrcode='777777', free_pbs=0)
         share.save()
 
 
@@ -87,7 +91,10 @@ def seed_pbs():
         kw['location'] = randint(1, 69)
         kw['status'] = 'free'
         kw['code'] = 'wtf is that'
-        pb = Powerbank(capacity=randint(1, 99999), location=randint(1, 69), status='free', code='wtf is that')
+        pb = Powerbank(capacity=randint(1, 99999),
+                       location=randint(1, 69),
+                       status='free',
+                       code='wtf is that')
         pb.save()
 
 

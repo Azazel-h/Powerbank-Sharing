@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from sharing.models import Share, Powerbank, Wallet, PaymentPlan, Order
-from sharing.views.helpers import get_profile, get_last_order, remaining_min, fail_order
+from django.shortcuts import render, redirect
 from sharing.views.scan import unverified
+from sharing.views.helpers import get_profile, get_last_order, \
+     remaining_min, fail_order
 
 
 @login_required
@@ -39,22 +40,22 @@ def ordering(request, pk):
         wallet_id = request.POST.get('wallet')
         payment_plan = PaymentPlan.objects.filter(id=payment_plan_id)[0]
         wallet = Wallet.objects.filter(id=wallet_id)[0]
-        if order_type != None and pb_capacity != None:
+        if order_type is not None and pb_capacity is not None:
             cands = Powerbank.objects.all().filter(location=pk, status='free')
             cand = None
-            if pb_capacity == 'small':  # находим максимальный до 4000
+            if pb_capacity == 'small':
                 mx_cand = 0
                 for pb in cands:
                     if pb.capacity > mx_cand and pb.capacity <= 4000:
                         mx_cand = pb.capacity
                         cand = pb
-            elif pb_capacity == 'medium':  # находим максимальный от 4001 до 10000
+            elif pb_capacity == 'medium':
                 mx_cand = 0
                 for pb in cands:
                     if pb.capacity > mx_cand and 4001 <= pb.capacity <= 10000:
                         mx_cand = pb.capacity
                         cand = pb
-            elif pb_capacity == 'large':  # находим самый максимальный
+            elif pb_capacity == 'large':
                 mx_cand = 0
                 for pb in cands:
                     if pb.capacity > mx_cand:
@@ -62,12 +63,21 @@ def ordering(request, pk):
                         cand = pb
             else:
                 pass
-            if cand != None:
+            if cand is not None:
                 if order_type == 'N':
-                    order = Order(wallet=wallet, payment_plan=payment_plan, order_type='immediate', pb=cand,
-                                  share=share, profile=get_profile(request.user), reservation_time=2)
+                    order = Order(wallet=wallet,
+                                  payment_plan=payment_plan,
+                                  order_type='immediate',
+                                  pb=cand,
+                                  share=share,
+                                  profile=get_profile(request.user),
+                                  reservation_time=2)
                 else:
-                    order = Order(wallet=wallet, payment_plan=payment_plan, order_type='hold', pb=cand, share=share,
+                    order = Order(wallet=wallet,
+                                  payment_plan=payment_plan,
+                                  order_type='hold',
+                                  pb=cand,
+                                  share=share,
                                   profile=get_profile(request.user))
                 order.save()
                 cand.status = 'ordered'
@@ -89,7 +99,7 @@ def pending(request):
         return unverified(request)
     order = get_last_order(get_profile(request.user))
     rem = remaining_min(order)
-    if rem != None:
+    if rem is not None:
         if rem <= 0:
             fail_order(order)
     if order.progress != 'created':
