@@ -42,8 +42,8 @@ def remaining_min(order):
     if order.progress != 'created':
         return None
     when_ordered = order.timestamp
-    deadline = when_ordered +
-    datetime.timedelta(minutes=order.reservation_time)
+    deadline = when_ordered + \
+        datetime.timedelta(minutes=order.reservation_time)
     now = datetime.datetime.now(datetime.timezone.utc)
     return (deadline - now).total_seconds() / 60.0
 
