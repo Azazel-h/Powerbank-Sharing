@@ -18,3 +18,12 @@ class TestUser(TestCase):
 
         self.assertEqual('Alexander', user.username)
         self.assertEqual(user, profile.user)
+
+    def test_change_name(self):
+        pass
+
+    def test_change_email(self):
+        pass
+
+    def test_change_password(self):
+        pass
