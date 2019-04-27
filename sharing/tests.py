@@ -5,7 +5,9 @@ from sharing.models import Profile
 
 class TestUser(TestCase):
     def setUp(self) -> None:
-        user = User.objects.create_user(username='koritsa', email='test@ya.ru', password='12341234')
+        user = User.objects.create_user(username='koritsa',
+                                        email='test@ya.ru',
+                                        password='12341234')
         Profile.objects.create(user=user, name='koritsa')
 
     def test_signup_user(self):
