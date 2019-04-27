@@ -6,10 +6,14 @@ from sharing.models import Profile
 
 
 class SignUpForm(UserCreationForm):
-    username = forms.CharField(error_messages={'required': 'Это поле обязательно.'})
+    username = forms.CharField(error_messages={'required':
+                                               'Это поле обязательно.'})
     email = forms.EmailField(max_length=254, required=True,
-                             error_messages={'max_length': 'Максимальная длина почты - 254.',
-                                             'required': 'Это поле обязательно.'})
+                             error_messages={'max_length':
+                                             'Максимальная' +
+                                             'длина почты - 254.',
+                                             'required':
+                                             'Это поле обязательно.'})
 
     error_messages = {
         'required': 'Это поле обязательно.',
@@ -32,7 +36,9 @@ class EmailChangeForm(forms.Form):
     new_email1 = forms.EmailField(
         label=("Новая почта"),
         max_length=254,
-        error_messages={'max_length': 'Максимальная длина почты - 254.', 'required': 'Это поле обязательно.'},
+        error_messages={'max_length':
+                        'Максимальная длина почты - 254.',
+                        'required': 'Это поле обязательно.'},
         widget=forms.EmailInput,
         required=True,
     )
@@ -40,7 +46,9 @@ class EmailChangeForm(forms.Form):
     new_email2 = forms.EmailField(
         label=("Подтверждение новой почты"),
         max_length=254,
-        error_messages={'max_length': 'Максимальная длина почты - 254.', 'required': 'Это поле обязательно.'},
+        error_messages={'max_length':
+                        'Максимальная длина почты - 254.',
+                        'required': 'Это поле обязательно.'},
         widget=forms.EmailInput,
         required=True,
     )
@@ -50,7 +58,9 @@ class ChangeNameForm(forms.ModelForm):
     name = forms.CharField(
         label='Изменить имя',
         max_length=512,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'text', 'placeholder': 'Введите новое имя'})
+        widget=forms.TextInput(attrs={'class': 'form-control',
+                                      'type': 'text',
+                                      'placeholder': 'Введите новое имя'})
     )
 
     class Meta:
@@ -62,7 +72,9 @@ class AvatarPhotoForm(forms.ModelForm):
     photo = forms.FileField(
         label='Выберите фото',
         required=False,
-        widget=forms.FileInput(attrs={'class': 'custom-file-input', 'type': 'file', 'id': 'customFile'})
+        widget=forms.FileInput(attrs={'class': 'custom-file-input',
+                                      'type': 'file',
+                                      'id': 'customFile'})
     )
 
     class Meta:
@@ -74,11 +86,14 @@ class PassportPhotoForm(forms.ModelForm):
     passport = forms.FileField(
         label='Выберите фото',
         required=False,
-        widget=forms.FileInput(attrs={'class': 'custom-file-input', 'type': 'file', 'id': 'customFile'}))
+        widget=forms.FileInput(attrs={'class': 'custom-file-input',
+                                      'type': 'file',
+                                      'id': 'customFile'}))
 
     class Meta:
         model = Profile
         fields = ('passport',)
+
 
 """
 class BookingForm(form.ModelForm):

@@ -42,9 +42,9 @@ urlpatterns = [
 
     path('scan', views.scan, name='scan'),
     path('session', views.session, name='session'),
-    
+
     path('cheat', views.make_verified, name='cheat'),
-    url(r'^order/(?P<pk>\d+)/$', views.ordering, name='ordering'),  
+    url(r'^order/(?P<pk>\d+)/$', views.ordering, name='ordering'),
     path('pending', views.pending, name='pending'),
     path('cancelled', views.cancelled, name='cancelled'),
     path('debug/make_verified', views.make_verified, name='make_verified'),
@@ -53,10 +53,13 @@ urlpatterns = [
     path('debug/seed', views.seed, name='seed'),
     path('debug/display_plans', views.display_plans, name='display_plans'),
     path('debug/reset_orders', views.reset_orders, name='reset_orders'),
-    
-    path('payment/add_payment_plan', views.add_payment_plan, name='add_payment_plan'),
-    path('payment/add_wallet', views.add_wallet, name='add_wallet')
+
+    path('payment/add_payment_plan',
+         views.add_payment_plan, name='add_payment_plan'),
+    path('payment/add_wallet',
+         views.add_wallet, name='add_wallet')
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
