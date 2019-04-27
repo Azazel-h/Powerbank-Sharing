@@ -13,7 +13,10 @@ def add_payment_plan(request):
         description = request.POST.get('description')
         payment_type = request.POST.get('payment_type')
         cost = request.POST.get('cost')
-        payment_plan = PaymentPlan(name=name, description=description, payment_type=payment_type, cost=cost)
+        payment_plan = PaymentPlan(name=name,
+                                   description=description,
+                                   payment_type=payment_type,
+                                   cost=cost)
         payment_plan.save()
         return HttpResponse('Новый тариф успешно добавлен!')
     return render(request, 'payment/add_payment_plan.html')
@@ -25,7 +28,10 @@ def add_wallet(request):
         name = request.POST.get('name')
         payment_method = request.POST.get('payment_method')
         balance = request.POST.get('balance')
-        wallet = Wallet(name=name, payment_method=payment_method, status='active', balance=balance)
+        wallet = Wallet(name=name,
+                        payment_method=payment_method,
+                        status='active',
+                        balance=balance)
         profile = get_profile(request.user)
         wallet.save()
         wallet_str = profile.wallets

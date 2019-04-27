@@ -15,7 +15,7 @@ def scan(request):
         return redirect('/')
     if request.method == 'POST':
         scanned_code = request.POST.get('qrcode')
-        if order.progress == 'created': # Если пользователь заказал зараннее
+        if order.progress == 'created':
             if order.share.qrcode == scanned_code:
                 order.progress = 'applied'
                 order.save()
@@ -36,7 +36,7 @@ def unverified(request):
         reasons.append('Не активирован почтовый адрес')
     if not profile.passport_status == 'success':
         reasons.append('Не подтверждён паспорт')
-    return render(request, 'scan/unverified.html', { 'reasons' : reasons })
+    return render(request, 'scan/unverified.html', {'reasons': reasons})
 
 
 @login_required

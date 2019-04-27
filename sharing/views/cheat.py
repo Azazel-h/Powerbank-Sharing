@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from sharing.models import Share, Profile, Order, PaymentPlan
-from sharing.views.helpers import get_profile, reset_sessions_and_orders, seed_pbs, seed_points
+from sharing.views.helpers import get_profile, reset_sessions_and_orders, \
+     seed_pbs, seed_points
 
 
 @login_required

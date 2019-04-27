@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
-from sharing.forms import ChangeFormPassword, SignUpForm, EmailChangeForm, PassportPhotoForm, ChangeNameForm, \
-    AvatarPhotoForm
+from sharing.forms import ChangeFormPassword, SignUpForm, \
+     EmailChangeForm, PassportPhotoForm, ChangeNameForm, \
+     AvatarPhotoForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
@@ -14,7 +15,8 @@ def account(request):
     context = {
         'user': request.user,
         'profile': profile,
-        'profile_progress': Profile.get_progress_complete_account(request.user),
+        'profile_progress':
+        Profile.get_progress_complete_account(request.user),
         'free_power_banks': powerbank_percentage(),
         'pb': Powerbank.get_all(),
         'share': Share.get_all()
@@ -41,7 +43,8 @@ def account(request):
 @login_required
 def users_passports(request):
     """
-    Страница, на которой админ может одобрить фотографию с паспортом или отклонить.
+    Страница, на которой админ может
+    одобрить фотографию с паспортом или отклонить.
     :param request:
     :return:
     """
@@ -98,7 +101,8 @@ def change_email(request):
         current_user = request.user
         form = EmailChangeForm(request.POST)
         if form.is_valid():
-            if form.cleaned_data['new_email1'] == form.cleaned_data['new_email2']:
+            if form.cleaned_data['new_email1'] == \
+               form.cleaned_data['new_email2']:
                 current_user.email = form.cleaned_data['new_email1']
                 current_user.save()
                 context = {
