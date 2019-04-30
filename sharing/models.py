@@ -1,3 +1,9 @@
+"""
+Модули:
+    -django:
+        - db
+        - contrib.auth.models
+"""
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -16,6 +22,10 @@ class Powerbank(models.Model):
 
     @staticmethod
     def get_all():
+        """
+        Получить все объекты
+        :return:
+        """
         return Powerbank.objects.all()
 
 
@@ -39,7 +49,7 @@ class Profile(models.Model):
     планов оплаты из модели PaymentPlan
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=512,  null=True)
+    name = models.CharField(max_length=512, null=True)
     active_mail = models.BooleanField(default=False)
     photo = models.FileField(upload_to='users/')
     passport = models.FileField(upload_to='passports/')
@@ -51,15 +61,20 @@ class Profile(models.Model):
 
     @staticmethod
     def get_progress_complete_account(user):
+        """
+        Функция проверки заполненности профиля[%]
+        :param user:
+        :return:
+        """
         default = ['', False, '', '']
         profile = Profile.objects.get(user=user)
-        d = {
+        date = {
             'name': profile.name,
             'active_mail': profile.active_mail,
             'photo': profile.photo,
             'passport': profile.passport
         }
-        res = [x for x in list(d.values()) if x not in default]
+        res = [x for x in list(date.values()) if x not in default]
         return {
             'num-completed': len(res),
             'percentage': str((100 * len(res) // len(default))) + '%'
@@ -67,6 +82,17 @@ class Profile(models.Model):
 
 
 class Share(models.Model):
+    """
+    Модель станции powerbank'ов:
+        - title:
+        - address:
+        - crds_lot:
+        - crds_lat:
+        - time:
+        - qrcode:
+        - ip:
+        - free_pbs:
+    """
     title = models.CharField(max_length=256)
     address = models.CharField(max_length=512)
     crds_lot = models.FloatField()
@@ -78,6 +104,10 @@ class Share(models.Model):
 
     @staticmethod
     def get_all():
+        """
+        Получить все объекты
+        :return:
+        """
         return Share.objects.all()
 
 

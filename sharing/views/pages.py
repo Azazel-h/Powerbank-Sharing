@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from sharing.models import Share, Profile, Powerbank
 from sharing.views.helpers import check_reservations, get_last_order, \
-    get_profile, remaining_min, fail_order, free_counted, remaining_started
+    get_profile, remaining_min, fail_order, FREE_COUNTED, REMAINING_STARTED
 
 
 def index(request):

@@ -1,13 +1,23 @@
-from sharing.models import Powerbank, Profile, Share, Order
+"""
+Модули:
+    - sharing.models
+    - datetime
+    - random
+"""
 import datetime
 from random import randint
+from sharing.models import Powerbank, Profile, Share, Order
 
 
-free_counted = False
-remaining_started = False
+FREE_COUNTED = False
+REMAINING_STARTED = False
 
 
 def powerbank_percentage():
+    """
+    Процент доступных powerbank'ов
+    :return:
+    """
     free = len(Powerbank.objects.filter(status='free'))
     total = len(Powerbank.get_all())
     if total == 0:
@@ -16,14 +26,23 @@ def powerbank_percentage():
 
 
 def get_profile(user):
+    """
+    Получить профиль по пользователю
+    :param user:
+    :return:
+    """
     return Profile.objects.get(user=user)
 
 
 def recount_free():
+    """
+    Пересчет доступных powerbank'ов
+    :return:
+    """
     shares = Share.get_all()
-    for sh in shares:
-        sh.free_pbs = 0
-        sh.save()
+    for share in shares:
+        share.free_pbs = 0
+        share.save()
     pbs = Powerbank.objects.filter(status='free')
     for item in pbs:
         share = Share.objects.get(id=item.location)
@@ -32,13 +51,23 @@ def recount_free():
 
 
 def get_last_order(profile):
+    """
+
+    :param profile:
+    :return:
+    """
     orders = Order.objects.filter(profile=profile)
-    if len(orders) == 0:
+    if not orders:
         return Order(progress='failed')
     return orders[len(orders) - 1]
 
 
 def remaining_min(order):
+    """
+
+    :param order:
+    :return:
+    """
     if order.progress != 'created':
         return None
     when_ordered = order.timestamp
@@ -49,34 +78,48 @@ def remaining_min(order):
 
 
 def fail_order(order):
+    """
+
+    :param order:
+    :return:
+    """
     order.progress = 'failed'
-    pb = order.pb
+    power = order.pb
     share = order.share
     share.free_pbs += 1
-    pb.status = 'free'
+    power.status = 'free'
     share.save()
-    pb.save()
+    power.save()
     order.save()
 
 
 def check_reservations():
+    """
+
+    :return:
+    """
     profiles = Profile.objects.all()
-    for pr in profiles:
-        rem = remaining_min(get_last_order(pr))
-        if rem is not None:
-            if rem <= 0:
-                fail_order(get_last_order(pr))
+    for profile in profiles:
+        remain = remaining_min(get_last_order(profile))
+        if remain is not None:
+            if remain <= 0:
+                fail_order(get_last_order(profile))
 
 
 def seed_points():
-    for i in range(120):
-        kw = {}
-        kw['title'] = 'seed'
-        kw['address'] = 'seed'
-        kw['crds_lot'] = float(randint(10, 110))
-        kw['crds_lat'] = float(randint(10, 110))
-        kw['qrcode'] = '777777'
-        kw['free_pbs'] = 0
+    """
+
+    :return:
+    """
+    i = 0
+    while i < 120:
+        kiwi = {}
+        kiwi['title'] = 'seed'
+        kiwi['address'] = 'seed'
+        kiwi['crds_lot'] = float(randint(10, 110))
+        kiwi['crds_lat'] = float(randint(10, 110))
+        kiwi['qrcode'] = '777777'
+        kiwi['free_pbs'] = 0
         share = Share(title='seed', address='seed',
                       crds_lot=float(randint(10, 110)),
                       crds_lat=float(randint(10, 110)),
@@ -85,26 +128,40 @@ def seed_points():
 
 
 def seed_pbs():
-    for i in range(120):
-        kw = {}
-        kw['capacity'] = randint(1, 99999)
-        kw['location'] = randint(1, 69)
-        kw['status'] = 'free'
-        kw['code'] = 'wtf is that'
-        pb = Powerbank(capacity=randint(1, 99999),
-                       location=randint(1, 69),
-                       status='free',
-                       code='wtf is that')
-        pb.save()
+    """
+
+    :return:
+    """
+    i = 0
+    while i < 120:
+        kiwi = {}
+        kiwi['capacity'] = randint(1, 99999)
+        kiwi['location'] = randint(1, 69)
+        kiwi['status'] = 'free'
+        kiwi['code'] = 'wtf is that'
+        power = Powerbank(capacity=randint(1, 99999),
+                          location=randint(1, 69),
+                          status='free',
+                          code='wtf is that')
+        power.save()
 
 
 def reset_sessions_and_orders():
+    """
+
+    :return:
+    """
     active_sessions = Order.objects.filter(progress='applied')
     for session in active_sessions:
         fail_order(session)
 
 
 def count_profit(order):
+    """
+
+    :param order:
+    :return:
+    """
     if order.progress != 'applied':
         return None
     when_ordered = order.timestamp
