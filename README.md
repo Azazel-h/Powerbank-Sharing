@@ -1,7 +1,8 @@
 # PowerBank Sharing - Energo
 
 
-[![pipeline status](https://gitlab.informatics.ru/alexkoritsa/powerbank-sharing/badges/master/pipeline.svg)](https://gitlab.informatics.ru/alexkoritsa/powerbank-sharing/commits/master)
+[![pipeline status](https://gitlab.informatics.ru/alexkoritsa/powerbank-sharing/badges/pylint/pipeline.svg)](https://gitlab.informatics.ru/alexkoritsa/powerbank-sharing/commits/master)
+![pylint](https://gitlab.informatics.ru/alexkoritsa/powerbank-sharing/badges/pylint/pyling.svg)
 
 > Если у Вас вдруг разрядился телефон или планшет, а у Вас с собой ничего нет - Вам срочно нужен PowerBank!
 
