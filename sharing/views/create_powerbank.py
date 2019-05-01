@@ -14,7 +14,6 @@ from django.contrib.auth.decorators import login_required
 from sharing.models import Share, Powerbank
 
 
-
 @login_required
 def add_powerbank_sharing(request):
     """
