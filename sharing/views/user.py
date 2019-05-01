@@ -73,15 +73,14 @@ def users_passports(request):
 
     if request.method == 'POST':
         status = request.POST.get('status')
-        id = request.POST.get('id')
-        profile = Profile.objects.get(id=id)
+        id_key = request.POST.get('id')
+        profile = Profile.objects.get(id=id_key)
 
         if status == 'approve':
             profile.passport_status = 'success'
             profile.save()
             return HttpResponse('success')
-
-        elif status == 'reject':
+        if status == 'reject':
             profile.passport_status = 'fail'
             profile.save()
             return HttpResponse('fail')

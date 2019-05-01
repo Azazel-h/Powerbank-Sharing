@@ -1,6 +1,6 @@
 """
 Модули:
-    -django:
+    - django:
         - db
         - contrib.auth.models
 """

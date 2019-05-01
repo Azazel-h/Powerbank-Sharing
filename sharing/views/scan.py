@@ -1,12 +1,26 @@
+"""
+Модули:
+    - django:
+        - shortcuts
+        - contrib.auth.decorators
+    - sharing:
+        - models
+        - views.helpers
+"""
+import requests
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from sharing.models import Profile
-import requests
 from sharing.views.helpers import get_last_order, get_profile, count_profit
 
 
 @login_required
 def scan(request):
+    """
+    Сканирование и переход на страницу сессии
+    :param request:
+    :return:
+    """
     profile = get_profile(request.user)
     order = get_last_order(profile)
     if not profile.active_mail or profile.passport_status != 'success':
@@ -19,17 +33,18 @@ def scan(request):
             if order.share.qrcode == scanned_code:
                 order.progress = 'applied'
                 order.save()
-                return render(request, 'scan/session.html')
-        else:
-            '''
-                energo Pro - мнговенный заказ пб без бронирования
-            '''
-            pass
+                page = 'scan/session.html'
     else:
-        return render(request, 'scan/scan.html')
+        page = 'scan/scan.html'
+    return render(request, page)
 
 
 def unverified(request):
+    """
+    Страница причины отказа
+    :param request:
+    :return:
+    """
     profile = Profile.objects.get(user=request.user)
     reasons = []
     if not profile.active_mail:
@@ -41,29 +56,28 @@ def unverified(request):
 
 @login_required
 def session(request):
+    """
+    Страница сессиии
+    :param request:
+    :return:
+    """
     profile = Profile.objects.get(user=request.user)
     order = get_last_order(profile)
-    pb = order.pb
+    power = order.pb
     ctx = {}
-    if not order.progress == 'applied':
+    if order.progress != 'applied':
         return redirect('/')
-    """
-        Обработка начала/конца сессии -- выдача пб, валидация сессии, прочее
-    """
-    if pb.status == 'ordered':
-        ejreq = requests.get('http://' + order.share.ip + '/')
-        # Начать оплату
-        pb.status = 'occupied'
-    elif pb.status == 'returning':
-        ejreq = requests.get('http://' + order.share.ip + '/')
-        # Конец оплаты
-        pb.status = 'charging'
-    elif pb.status == 'occupied':
+    if power.status == 'ordered':
+        requests.get('http://' + order.share.ip + '/')
+        power.status = 'occupied'
+    elif power.status == 'returning':
+        requests.get('http://' + order.share.ip + '/')
+        power.status = 'charging'
+    elif power.status == 'occupied':
         ctx['to_pay'] = count_profit(order)
-        ctx['capacity'] = pb.capacity
+        ctx['capacity'] = power.capacity
         ctx['timestamp'] = order.timestamp
         ctx['payment_plan'] = order.payment_plan.name
         ctx['wallet'] = order.wallet.name
-    pb.save()
-    # Текущая оплата...
+    power.save()
     return render(request, 'scan/session.html', ctx)

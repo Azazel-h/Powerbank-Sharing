@@ -1,14 +1,28 @@
+"""
+Модули:
+    - django:
+        - shortcuts
+    - sharing:
+        - models
+        - helpers
+"""
 from django.shortcuts import render
 from sharing.models import Share, Profile, Powerbank
 from sharing.views.helpers import check_reservations, get_last_order, \
-    get_profile, remaining_min, fail_order, FREE_COUNTED, REMAINING_STARTED
+    get_profile, remaining_min, fail_order
 
 
 def index(request):
+    """
+    Главная страница
+    :param request:
+    :return:
+    """
+    free_counted = False
+    remaining_started = False
     rem = 0
     pending_notification = False
     session_notification = False
-    global free_counted, remaining_started
     if not free_counted:
         # recount_free()
         free_counted = True
@@ -43,8 +57,18 @@ def index(request):
 
 
 def contacts(request):
+    """
+    Страница о нас
+    :param request:
+    :return:
+    """
     return render(request, 'contacts.html', {})
 
 
 def error_rights(request):
+    """
+    Ограничение прав
+    :param request:
+    :return:
+    """
     return render(request, 'error_rights.html')

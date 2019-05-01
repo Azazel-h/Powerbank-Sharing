@@ -1,38 +1,64 @@
+"""
+Модули:
+    - django:
+        - shortcuts
+        - contrib.auth.decorators
+    - sharing:
+        - models
+        - views:
+            - scan
+            - helpers
+"""
 from django.contrib.auth.decorators import login_required
-from sharing.models import Share, Powerbank, Wallet, PaymentPlan, Order
 from django.shortcuts import render, redirect
+from sharing.models import Share, Powerbank, Wallet, PaymentPlan, Order
 from sharing.views.scan import unverified
 from sharing.views.helpers import get_profile, get_last_order, \
      remaining_min, fail_order
 
 
 @login_required
-def ordering(request, pk):
+def ordering(request, key):
+    """
+    Страница заказа
+    :param request:
+    :param key:
+    :return:
+    """
     profile = get_profile(request.user)
+    share = Share.objects.get(id=key)
     if not profile.active_mail or profile.passport_status != 'success':
         return unverified(request)
     if get_last_order(profile).progress == 'applied':
         return redirect('/session')
-    share = Share.objects.get(id=pk)
-    ctx = {"location": share.address}
-    ctx["small"] = False
-    ctx["medium"] = False
-    ctx["large"] = False
-    for pb in Powerbank.objects.filter(location=share.id, status='free'):
-        if pb.capacity <= 4000:
+    ctx = {"location": share.address, "small": False, "medium": False, "large": False}
+    for power in Powerbank.objects.filter(location=share.id, status='free'):
+        if power.capacity <= 4000:
             ctx["small"] = True
-        if 4001 <= pb.capacity <= 10000:
+        if 4001 <= power.capacity <= 10000:
             ctx["medium"] = True
-        if pb.capacity >= 10001:
+        if power.capacity >= 10001:
             ctx["large"] = True
-    ctx["pk"] = pk
+    ctx["pk"] = key
     wallets_id = list(map(int, profile.wallets.split()))
     wallets = []
     for wid in wallets_id:
         wallets.append(Wallet.objects.filter(id=wid)[0])
     ctx["plans"] = PaymentPlan.objects.all()
     ctx["wallets"] = wallets
+    it_post(request, key, share, ctx)
+    return render(request, 'sharing/order.html', context=ctx)
 
+
+def it_post(request, key, share, ctx):
+    """
+
+    :param request:
+    :param key:
+    :param share:
+    :param ctx:
+    :return:
+    """
     if request.method == 'POST':
         order_type = request.POST.get('order_type')
         pb_capacity = request.POST.get('pb_capacity')
@@ -41,28 +67,20 @@ def ordering(request, pk):
         payment_plan = PaymentPlan.objects.filter(id=payment_plan_id)[0]
         wallet = Wallet.objects.filter(id=wallet_id)[0]
         if order_type is not None and pb_capacity is not None:
-            cands = Powerbank.objects.all().filter(location=pk, status='free')
+            cands = Powerbank.objects.all().filter(location=key, status='free')
             cand = None
-            if pb_capacity == 'small':
-                mx_cand = 0
-                for pb in cands:
-                    if pb.capacity > mx_cand and pb.capacity <= 4000:
-                        mx_cand = pb.capacity
-                        cand = pb
-            elif pb_capacity == 'medium':
-                mx_cand = 0
-                for pb in cands:
-                    if pb.capacity > mx_cand and 4001 <= pb.capacity <= 10000:
-                        mx_cand = pb.capacity
-                        cand = pb
-            elif pb_capacity == 'large':
-                mx_cand = 0
-                for pb in cands:
-                    if pb.capacity > mx_cand:
-                        mx_cand = pb.capacity
-                        cand = pb
-            else:
-                pass
+            mx_cand = 0
+            for power in cands:
+                if power.capacity > mx_cand and 4001 <= power.capacity <= 10000\
+                        and pb_capacity == 'medium':
+                    mx_cand = power.capacity
+                    cand = power
+                if mx_cand < power.capacity <= 4000 and pb_capacity == 'small':
+                    mx_cand = power.capacity
+                    cand = power
+                if power.capacity > mx_cand and pb_capacity == 'large':
+                    mx_cand = power.capacity
+                    cand = power
             if cand is not None:
                 if order_type == 'N':
                     order = Order(wallet=wallet,
@@ -89,11 +107,15 @@ def ordering(request, pk):
             else:
                 ctx['order_status'] = 'fail'
                 # не найдено (но такого не будет)
-    return render(request, 'sharing/order.html', context=ctx)
 
 
 @login_required
 def pending(request):
+    """
+    Страница готовности заказа
+    :param request:
+    :return:
+    """
     profile = get_profile(request.user)
     if not profile.active_mail or profile.passport_status != 'success':
         return unverified(request)
@@ -104,27 +126,29 @@ def pending(request):
             fail_order(order)
     if order.progress != 'created':
         return redirect('/')
-    ctx = {}
-    ctx['capacity'] = str(order.pb.capacity)
-    ctx['timestamp'] = str(order.timestamp)
-    ctx['remaining'] = int(remaining_min(order))
-    ctx['address'] = order.share.address
-    ctx['plan'] = order.payment_plan.name
-    ctx['wallet'] = order.wallet.name
+    ctx = {'capacity': str(order.pb.capacity), 'timestamp': str(order.timestamp),
+           'remaining': int(remaining_min(order)), 'address': order.share.address,
+           'plan': order.payment_plan.name,
+           'wallet': order.wallet.name}
     return render(request, 'scan/pending.html', context=ctx)
 
 
 @login_required
 def cancelled(request):
+    """
+    Страница отмененного заказа
+    :param request:
+    :return:
+    """
     orders = Order.objects.filter(profile=get_profile(request.user))
     last = len(orders) - 1
     order = orders[last]
     if order.progress != 'created':
         return redirect('/')
-    pb = order.pb
+    power = order.pb
     share = order.share
-    pb.status = 'free'
-    pb.save()
+    power.status = 'free'
+    power.save()
     order.progress = 'cancelled'
     order.save()
     share.free_pbs += 1

@@ -9,10 +9,6 @@ from random import randint
 from sharing.models import Powerbank, Profile, Share, Order
 
 
-FREE_COUNTED = False
-REMAINING_STARTED = False
-
-
 def powerbank_percentage():
     """
     Процент доступных powerbank'ов
@@ -64,7 +60,7 @@ def get_last_order(profile):
 
 def remaining_min(order):
     """
-
+    Функция подчета времени заказа
     :param order:
     :return:
     """
