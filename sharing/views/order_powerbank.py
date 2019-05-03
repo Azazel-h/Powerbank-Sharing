@@ -31,7 +31,8 @@ def ordering(request, key):
         return unverified(request)
     if get_last_order(profile).progress == 'applied':
         return redirect('/session')
-    ctx = {"location": share.address, "small": False, "medium": False, "large": False}
+    ctx = {"location": share.address, "small": False,
+           "medium": False, "large": False}
     for power in Powerbank.objects.filter(location=share.id, status='free'):
         if power.capacity <= 4000:
             ctx["small"] = True
@@ -71,8 +72,9 @@ def it_post(request, key, share, ctx):
             cand = None
             mx_cand = 0
             for power in cands:
-                if power.capacity > mx_cand and 4001 <= power.capacity <= 10000\
-                        and pb_capacity == 'medium':
+                if power.capacity > mx_cand\
+                   and 4001 <= power.capacity <= 10000\
+                   and pb_capacity == 'medium':
                     mx_cand = power.capacity
                     cand = power
                 if mx_cand < power.capacity <= 4000 and pb_capacity == 'small':
@@ -126,8 +128,10 @@ def pending(request):
             fail_order(order)
     if order.progress != 'created':
         return redirect('/')
-    ctx = {'capacity': str(order.pb.capacity), 'timestamp': str(order.timestamp),
-           'remaining': int(remaining_min(order)), 'address': order.share.address,
+    ctx = {'capacity': str(order.pb.capacity),
+           'timestamp': str(order.timestamp),
+           'remaining': int(remaining_min(order)),
+           'address': order.share.address,
            'plan': order.payment_plan.name,
            'wallet': order.wallet.name}
     return render(request, 'scan/pending.html', context=ctx)
