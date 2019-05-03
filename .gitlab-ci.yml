@@ -21,7 +21,7 @@ testing:
 pylint: 
   stage: style
   script:
-    - pylint -j 0 --load-plugins=pylint_django energo-machine/ Powerbank/ sharing/
+    - pylint -j 0 --load-plugins=pylint_django Powerbank/ sharing/
   
 pep8:
   stage: style

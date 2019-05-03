@@ -1,3 +1,6 @@
+"""
+Модули всех шаблонов страниц
+"""
 from sharing.views.user import *
 from sharing.views.pages import *
 from sharing.views.create_powerbank import *

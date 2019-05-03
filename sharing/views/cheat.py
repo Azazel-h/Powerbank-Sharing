@@ -1,3 +1,12 @@
+"""
+Модули:
+    - django:
+        - shortcuts
+        - contrib.auth.decorators
+    - sharing:
+        - models
+        - views.helpers
+"""
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from sharing.models import Share, Profile, Order, PaymentPlan
@@ -7,6 +16,11 @@ from sharing.views.helpers import get_profile, reset_sessions_and_orders, \
 
 @login_required
 def make_verified(request):
+    """
+    Проверка статуса для получения доступа
+    :param request:
+    :return:
+    """
     if not request.user.is_superuser:
         return redirect('/error/rights')
     profile = Profile.objects.get(user=request.user)
@@ -20,6 +34,11 @@ def make_verified(request):
 
 @login_required
 def display_points(request):
+    """
+    Страница отображения всех станций
+    :param request:
+    :return:
+    """
     if not request.user.is_superuser:
         return redirect('/error/rights')
     points = Share.get_all()
@@ -29,6 +48,11 @@ def display_points(request):
 
 @login_required
 def display_orders(request):
+    """
+    Страница заказов пользователя
+    :param request:
+    :return:
+    """
     if not request.user.is_superuser:
         return redirect('/error/rights')
     orders = Order.objects.filter(profile=get_profile(request.user))
@@ -38,6 +62,11 @@ def display_orders(request):
 
 @login_required
 def display_plans(request):
+    """
+    Страница всех тарифных планов
+    :param request:
+    :return:
+    """
     if not request.user.is_superuser:
         return redirect('/error/rights')
     plans = PaymentPlan.objects.all()
@@ -47,6 +76,11 @@ def display_plans(request):
 
 @login_required
 def reset_orders(request):
+    """
+    Сброс заказа
+    :param request:
+    :return:
+    """
     if not request.user.is_superuser:
         return redirect('/error/rights')
     reset_sessions_and_orders()
@@ -55,6 +89,11 @@ def reset_orders(request):
 
 @login_required
 def seed(request):
+    """
+    Заполнение моделей
+    :param request:
+    :return:
+    """
     if not request.user.is_superuser:
         return redirect('/error/rights')
     seed_points()

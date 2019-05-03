@@ -50,7 +50,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'PowerBank.urls'
+ROOT_URLCONF = 'power_bank.urls'
 
 TEMPLATES = [
     {
@@ -70,7 +70,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'PowerBank.wsgi.application'
+WSGI_APPLICATION = 'power_bank.wsgi.application'
 
 
 # Database
@@ -90,11 +90,11 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.' +
-        'password_validation.UserAttributeSimilarityValidator',
+                'password_validation.UserAttributeSimilarityValidator',
     },
     {
         'NAME': 'django.contrib.auth.' +
-        'password_validation.MinimumLengthValidator',
+                'password_validation.MinimumLengthValidator',
     },
     # {
     #     'NAME': 'django.contrib.auth.' +

@@ -1,16 +1,32 @@
+"""
+Модули:
+    - django:
+        - shortcuts
+        - contrib.auth:
+            - decorators
+    - sharing:
+        - models
+        - views.helpers
+        - forms
+"""
 from django.shortcuts import render, redirect, HttpResponse
-from sharing.forms import ChangeFormPassword, SignUpForm, \
-     EmailChangeForm, PassportPhotoForm, ChangeNameForm, \
-     AvatarPhotoForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
+from sharing.forms import ChangeFormPassword, SignUpForm, \
+     EmailChangeForm, PassportPhotoForm, ChangeNameForm, \
+     AvatarPhotoForm
 from sharing.models import Share, Profile, Powerbank
 from sharing.views.helpers import powerbank_percentage
 
 
 @login_required
 def account(request):
+    """
+    Профиль пользователя/админа
+    :param request:
+    :return:
+    """
     profile = Profile.objects.get(user=request.user)
     context = {
         'user': request.user,
@@ -57,15 +73,14 @@ def users_passports(request):
 
     if request.method == 'POST':
         status = request.POST.get('status')
-        id = request.POST.get('id')
-        profile = Profile.objects.get(id=id)
+        id_key = request.POST.get('id')
+        profile = Profile.objects.get(id=id_key)
 
         if status == 'approve':
             profile.passport_status = 'success'
             profile.save()
             return HttpResponse('success')
-
-        elif status == 'reject':
+        if status == 'reject':
             profile.passport_status = 'fail'
             profile.save()
             return HttpResponse('fail')
@@ -74,6 +89,11 @@ def users_passports(request):
 
 @login_required
 def change_password(request):
+    """
+    Страница смены пароля
+    :param request:
+    :return:
+    """
     if request.method == 'POST':
         form = ChangeFormPassword(request.user, request.POST)
         if form.is_valid():
@@ -97,6 +117,11 @@ def change_password(request):
 
 @login_required
 def change_email(request):
+    """
+    Страница смены электронной почты
+    :param request:
+    :return:
+    """
     if request.method == 'POST':
         current_user = request.user
         form = EmailChangeForm(request.POST)
@@ -122,6 +147,11 @@ def change_email(request):
 
 @login_required
 def change_name(request):
+    """
+    Страница смены имени пользователя
+    :param request:
+    :return:
+    """
     profile = Profile.objects.get(user=request.user)
     if request.method == 'POST':
         form = ChangeNameForm(request.POST)
@@ -146,6 +176,11 @@ def change_name(request):
 
 @login_required
 def change_photo(request):
+    """
+    Страница смены фото пользователя
+    :param request:
+    :return:
+    """
     profile = Profile.objects.get(user=request.user)
     if request.method == 'POST':
         form = AvatarPhotoForm(request.POST, request.FILES)
@@ -169,6 +204,11 @@ def change_photo(request):
 
 
 def signup(request):
+    """
+    Страница регистрации пользователя
+    :param request:
+    :return:
+    """
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():

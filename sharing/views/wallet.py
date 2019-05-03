@@ -1,3 +1,12 @@
+"""
+Модули:
+    - django:
+        - shortcuts
+        - contrib.auth.decorators
+    - sharing:
+        - models
+        - views.helpers
+"""
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from sharing.models import PaymentPlan, Wallet
@@ -6,6 +15,11 @@ from sharing.views.helpers import get_profile
 
 @login_required
 def add_payment_plan(request):
+    """
+    Страница добавления тарифного плана
+    :param request:
+    :return:
+    """
     if not request.user.is_superuser:
         return redirect('/')
     if request.method == 'POST':
@@ -24,6 +38,11 @@ def add_payment_plan(request):
 
 @login_required
 def add_wallet(request):
+    """
+    Страница добавления кошелька
+    :param request:
+    :return:
+    """
     if request.method == 'POST':
         name = request.POST.get('name')
         payment_method = request.POST.get('payment_method')

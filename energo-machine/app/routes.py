@@ -1,5 +1,10 @@
-from app import app
+"""
+Модули:
+    - os
+    - app
+"""
 import os
+from app import app
 
 
 @app.route('/')
