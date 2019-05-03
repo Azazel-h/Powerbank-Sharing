@@ -89,3 +89,51 @@ class TestUser(TestCase):
         client.post('/change/pass', data)
         res = client.login(username='koritsa', password='12345678')
         self.assertEqual(res, True)
+
+class TestSharing(TestCase):
+    """
+    Класс для тестирования систем, связанных с sharing'ом
+    """
+    def setUp(self):
+        """
+        Начальные параметры
+        :return:
+        """
+        user = User.objects.create_user(username='xenon',
+                                        email='test@ya.ru',
+                                        password='23452345')
+        Profile.objects.create(user=user, name='xenon')
+
+        superuser = User.objects.create_superuser(username='root',
+                                        email='root@ya.ru',
+                                        password='rootpass')
+        Profile.objects.create(user=superuser, name='root')
+
+    def test_login_page_add_powerbank_sharing(self):
+        """
+        Вход на страницу с аккаунтов разного приоритета
+        :return:
+        """
+        client = Client()
+        admin = Client()
+
+        client.login(username='xenon', password='23452345')
+        admin.login(username='root', password='rootpass')
+
+        data = {
+            'title': 'Main',
+            'address': 'Moscow, Russia',
+            'qrcode': 'Hello, world!',
+            'ip_address': '127.0.0.1',
+            'crds': '1'
+        }
+
+        client.post('/sharing/add.html', data)
+        profile = Profile.objects.get(id=1)
+
+        self.assertEqual('302', '302')
+
+        admin.post('/sharing/add.html', data)
+        profile = Profile.objects.get(id=1)
+
+        self.assertEqual('200', '200')
