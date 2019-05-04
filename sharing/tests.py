@@ -90,6 +90,7 @@ class TestUser(TestCase):
         res = client.login(username='koritsa', password='12345678')
         self.assertEqual(res, True)
 
+
 class TestSharing(TestCase):
     """
     Класс для тестирования систем, связанных с sharing'ом
@@ -105,35 +106,48 @@ class TestSharing(TestCase):
         Profile.objects.create(user=user, name='xenon')
 
         superuser = User.objects.create_superuser(username='root',
-                                        email='root@ya.ru',
-                                        password='rootpass')
+                                                  email='root@ya.ru',
+                                                  password='rootpass')
         Profile.objects.create(user=superuser, name='root')
 
-    def test_login_page_add_powerbank_sharing(self):
+    def test_login_user_page_add_powerbank_sharing(self):
         """
-        Вход на страницу с аккаунтов разного приоритета
+        Вход на страницу с аккаунта пользователя
         :return:
         """
         client = Client()
-        admin = Client()
 
         client.login(username='xenon', password='23452345')
+
+        data = {
+            'title': 'Main',
+            'address': 'Moscow, Russia',
+            'qrcode': 'Hello, world!',
+            'ip': '127.0.0.1',
+            'crds': '[50.450441,30.52355]'
+        }
+
+        response = client.post('/sharing/add', data)
+
+        self.assertEqual(302, response.status_code)
+
+    def test_login_admin_page_add_powerbank_sharing(self):
+        """
+        Вход на страницу с аккаунта администратора
+        :return:
+        """
+        admin = Client()
+
         admin.login(username='root', password='rootpass')
 
         data = {
             'title': 'Main',
             'address': 'Moscow, Russia',
             'qrcode': 'Hello, world!',
-            'ip_address': '127.0.0.1',
-            'crds': '1'
+            'ip': '127.0.0.1',
+            'crds': '[50.450441,30.52355]'
         }
 
-        client.post('/sharing/add.html', data)
-        profile = Profile.objects.get(id=1)
+        response = admin.post('/sharing/add', data)
 
-        self.assertEqual('302', '302')
-
-        admin.post('/sharing/add.html', data)
-        profile = Profile.objects.get(id=1)
-
-        self.assertEqual('200', '200')
+        self.assertEqual(200, response.status_code)
