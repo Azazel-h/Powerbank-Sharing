@@ -25,7 +25,6 @@ def make_verified(request):
         return redirect('/error/rights')
     profile = Profile.objects.get(user=request.user)
     profile.passport_status = 'success'
-    profile.session_status = 'inactive'
     profile.active_mail = True
     profile.name = 'Sbeve Sbeve'
     profile.save()
