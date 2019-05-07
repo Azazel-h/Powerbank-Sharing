@@ -116,18 +116,28 @@ class TestAddPowerbank(TestCase):
 
     def test_add_pb(self):
         """
-        Добавление новой станции
+        Добавление нового powerbank'а на станцию
         :return:
         """
         admin = Client()
 
         admin.login(username='root', password='rootpass')
 
-        data = {
-            'location': 'Main',
-            'capacity': 'Moscow, Russia',
+        fdata = {
+            'title': 'Main',
+            'address': 'Moscow, Russia',
+            'qrcode': 'Hello, world!',
+            'ip': '127.0.0.1',
+            'crds': '[50.450441,30.52355]'
         }
 
-        response = admin.post('/sharing/add', data)
+        admin.post('/sharing/add', fdata)
+
+        data = {
+            'location': '1',
+            'capacity': '20000',
+        }
+
+        response = admin.post('/sharing/add_pb', data)
 
         self.assertEqual('OK', response.reason_phrase)
