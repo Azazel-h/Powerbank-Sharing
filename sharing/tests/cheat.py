@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
-from sharing.models import Profile
+from sharing.models import Share, Profile, Order, PaymentPlan
 
 class TestCheat(TestCase):
     def setUp(self):
@@ -45,3 +45,38 @@ class TestCheat(TestCase):
         user.login(username='xenon', password='23452345')
         response = user.post('/debug/display_points')
         self.assertEqual(302, response.status_code)
+
+    def test_display_orders(self):
+        admin = Client()
+        admin.login(username='root', password='rootpass')
+        response = admin.post('/debug/display_orders')
+        self.assertEqual(response.context['orders'].count(), 0)
+
+    def test_display_orders_validation(self):
+        user = Client()
+        user.login(username='xenon', password='23452345')
+        response = user.post('/debug/display_orders')
+        self.assertEqual(302, response.status_code)
+
+    def test_display_plans(self):
+        admin = Client()
+        admin.login(username='root', password='rootpass')
+        response = admin.post('/debug/display_plans')
+        self.assertEqual(response.context['plans'].count(), 0)
+
+    def test_display_plans_validation(self):
+        user = Client()
+        user.login(username='xenon', password='23452345')
+        response = user.post('/debug/display_plans')
+        self.assertEqual(302, response.status_code)
+
+    def test_reset_orders(self):
+        admin = Client()
+        admin.login(username='root', password='rootpass')
+        Order.objects.create(progress='applied')
+        response = admin.post('/debug/reset_orders')
+        self.assertEqual(Order.objects.all().count(), 0)
+
+
+
+
