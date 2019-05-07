@@ -7,17 +7,17 @@
         - models
         - views.helpers
 """
-import requests
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
-from sharing.models import Profile
-from sharing.views.helpers import get_last_order, get_profile, count_profit
+from sharing.models import Profile, Share
+from sharing.views.helpers import get_last_order, get_profile, count_profit, \
+    end_order, order_duration
 
 
 @login_required
 def scan(request):
     """
-    Сканирование и переход на страницу сессии
+    Сканирование кода
     :param request:
     :return:
     """
@@ -25,7 +25,7 @@ def scan(request):
     order = get_last_order(profile)
     if not profile.active_mail or profile.passport_status != 'success':
         return unverified(request)
-    if order.progress != 'created':
+    if order.progress != 'created' and order.progress != 'applied':
         return redirect('/')
     if request.method == 'POST':
         scanned_code = request.POST.get('qrcode')
@@ -33,7 +33,13 @@ def scan(request):
             if order.share.qrcode == scanned_code:
                 order.progress = 'applied'
                 order.save()
-                page = 'scan/session.html'
+                return HttpResponse('session')
+        elif order.progress == 'applied':
+            shares = Share.objects.all()
+            for cand_share in shares:
+                if cand_share.qrcode == scanned_code:
+                    end_order(order, cand_share)
+                    return HttpResponse('end')
     else:
         page = 'scan/scan.html'
     return render(request, page)
@@ -68,10 +74,10 @@ def session(request):
     if order.progress != 'applied':
         return redirect('/')
     if power.status == 'ordered':
-        requests.get('http://' + order.share.ip + '/')
+        # requests.get('http://' + order.share.ip + '/')
         power.status = 'occupied'
     elif power.status == 'returning':
-        requests.get('http://' + order.share.ip + '/')
+        # requests.get('http://' + order.share.ip + '/')
         power.status = 'charging'
     elif power.status == 'occupied':
         ctx['to_pay'] = count_profit(order)
@@ -81,3 +87,30 @@ def session(request):
         ctx['wallet'] = order.wallet.name
     power.save()
     return render(request, 'scan/session.html', ctx)
+
+
+@login_required
+def end(request):
+    """
+    Конец сессии, подсчет денег
+    """
+    profile = Profile.objects.get(user=request.user)
+    order = get_last_order(profile)
+    if order.progress != 'ended':
+        return redirect('/')
+    profit = count_profit(order)
+    wal = order.wallet
+    wal.balance -= profit
+    if wal.balance < 0:
+        wal.status = 'suspended'
+    wal.save()
+    ctx = {
+        'to_pay': profit,
+        'start': order.share.address,
+        'end': order.end_share.address,
+        'duration': order_duration(order),
+        'wallet': order.wallet.name,
+        'payment_plan': order.payment_plan.name,
+        'current_balance': wal.balance
+    }
+    return render(request, 'scan/end.html', ctx)
