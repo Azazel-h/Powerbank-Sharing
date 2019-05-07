@@ -70,13 +70,18 @@ class TestCheat(TestCase):
         response = user.post('/debug/display_plans')
         self.assertEqual(302, response.status_code)
 
+    #Пока не работает
     def test_reset_orders(self):
         admin = Client()
         admin.login(username='root', password='rootpass')
         Order.objects.create(progress='applied')
-        response = admin.post('/debug/reset_orders')
+        print(Order.objects.all())
+        admin.post('/debug/reset_orders')
         self.assertEqual(Order.objects.all().count(), 0)
 
-
-
+    def test_reset_orders_vlidation(self):
+        user = Client()
+        user.login(username='xenon', password='23452345')
+        response = user.post('/debug/reset_orders')
+        self.assertEqual(302, response.status_code)
 
