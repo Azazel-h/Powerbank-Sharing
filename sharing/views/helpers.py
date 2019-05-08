@@ -102,6 +102,7 @@ def end_order(order, end_share):
     order.end_share = end_share
     power = order.pb
     power.status = 'charging'
+    # requests.get('http://' + order.end_share.ip + '/')
     order.save()
     power.save()
 

@@ -39,9 +39,6 @@ def scan(request):
             for cand_share in shares:
                 if cand_share.qrcode == scanned_code:
                     end_order(order, cand_share)
-                    #
-                    # Открыть автомат
-                    #
                     return HttpResponse('end')
     else:
         page = 'scan/scan.html'
