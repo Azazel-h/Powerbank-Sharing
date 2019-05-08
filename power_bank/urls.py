@@ -25,7 +25,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('sharing/add', views.add_powerbank_sharing, name='add_sharing'),
     path('sharing/add_pb', views.add_pb, name='add_power_bank'),
-    url(r'^share/(?P<pk>\d+)/$', views.share_page, name='share_page'),
+    url(r'^share/(?P<key>\d+)/$', views.share_page, name='share_page'),
 
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/signup', views.signup, name='reg'),
@@ -42,9 +42,10 @@ urlpatterns = [
 
     path('scan', views.scan, name='scan'),
     path('session', views.session, name='session'),
+    path('end', views.end, name='end'),
 
     path('cheat', views.make_verified, name='cheat'),
-    url(r'^order/(?P<pk>\d+)/$', views.ordering, name='ordering'),
+    url(r'^order/(?P<key>\d+)/$', views.ordering, name='ordering'),
     path('pending', views.pending, name='pending'),
     path('cancelled', views.cancelled, name='cancelled'),
     path('debug/make_verified', views.make_verified, name='make_verified'),

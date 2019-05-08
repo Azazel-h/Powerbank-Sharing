@@ -60,7 +60,7 @@ def get_last_order(profile):
 
 def remaining_min(order):
     """
-    Функция подчета времени заказа
+    Функция подчета остатка времени бронирования
     :param order:
     :return:
     """
@@ -80,6 +80,8 @@ def fail_order(order):
     :return:
     """
     order.progress = 'failed'
+    order.end_timestamp = datetime.datetime.now(datetime.timezone.utc)
+    order.end_share = order.share
     power = order.pb
     share = order.share
     share.free_pbs += 1
@@ -87,6 +89,33 @@ def fail_order(order):
     share.save()
     power.save()
     order.save()
+
+
+def end_order(order, end_share):
+    """
+    Закончить заказ
+    :param order, end_share:
+    :return:
+    """
+    order.progress = 'ended'
+    order.end_timestamp = datetime.datetime.now(datetime.timezone.utc)
+    order.end_share = end_share
+    power = order.pb
+    power.status = 'charging'
+    # requests.get('http://' + order.end_share.ip + '/')
+    order.save()
+    power.save()
+
+
+def order_duration(order):
+    """
+    Длительность заказа в минутах
+    :param order:
+    :return:
+    """
+    start = order.timestamp
+    end = order.end_timestamp
+    return int((end - start).total_seconds() / 60.0)
 
 
 def check_reservations():
@@ -158,7 +187,7 @@ def count_profit(order):
     :param order:
     :return:
     """
-    if order.progress != 'applied':
+    if order.progress != 'applied' and order.progress != 'ended':
         return None
     when_ordered = order.timestamp
     now = datetime.datetime.now(datetime.timezone.utc)
