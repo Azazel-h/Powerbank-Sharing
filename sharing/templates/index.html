@@ -51,7 +51,7 @@
                             {% if user.is_authenticated %}
                                 '<div class="card">\n' +
                                 '    <div class="card-body">\n' +
-                                        '<h6 class="card-title"><span class="text-secondary"><a href="{% url 'share_page' pk=i.id %}"> {{ i.address }} </a></h6>\n' +
+                                        '<h6 class="card-title"><span class="text-secondary"><a href="{% url 'share_page' key=i.id %}"> {{ i.address }} </a></h6>\n' +
                                     {% if i.free_pbs <= 0 or session_notification %}
                                     '    <h4 class="card-title"><span class="text-secondary"> Недоступно </h4>\n' +
                                     {% endif %}
