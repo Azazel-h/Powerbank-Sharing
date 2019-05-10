@@ -1,32 +1,28 @@
 {% extends "base.html" %}
-{% block add_sharing_tab %}<li class="nav-item active"><a class="nav-link" href="{% url 'add_sharing' %}"> Добавить тариф </a></li>{% endblock %}
 {% block title %} Добавить тариф {% endblock %}
 
 {% block content %}
-    <style>
-        body, html{
-            width: 100%;
-            height: 85%;
-        }
-    </style>
     <div class="container">
         <div class="card">
             <div class="card-body">
-                <h2 class="card-title"> Добавить тариф </h2>
-{#                 <form>#}
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="name">Название тарифа</label>
-                                <input type="text" id="name" class="form-control" placeholder="Обычный"
-                                       required>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="description">Описание тарифа</label>
-                                <input type="text" id="description" class="form-control"
-                                        placeholder="Самый обычный тариф" required>
-                            </div>
-                            <label for="description">Оплата</label>
-                            <div class="col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
+                <h2 class="card-title"> Добавить новый тариф </h2>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="name"><strong> Название тарифа </strong></label>
+                            <input type="text" id="name" class="form-control" placeholder="Обычный"
+                                   required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="description"><strong>Добавьте короткое описание тарифа</strong></label>
+                            <input type="text" id="description" class="form-control"
+                                    placeholder="Самый обычный тариф" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-md-6">
+                            <label for="description"><strong>Оплата</strong></label><br>
+                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
                                 <label class="btn btn-secondary active">
                                   <input type="radio" value="perminute" id="payment_type" autocomplete="off"> Поминутная
                                 </label>
@@ -34,17 +30,21 @@
                                   <input type="radio" value="immediate" id="payment_type" autocomplete="off"> Мгновенная
                                 </label>
                             </div>
-                            <div class="form-group col-md-6">
-                                <label for="cost">Стоимость</label>
-                                <input type="number" id="cost" class="form-control"
-                                        placeholder="40" required>
-                            </div>
                         </div>
 
-                        <div class="form-group text-center">
-                            <input type="submit" class="btn btn-lg btn-success" value="Добавить" onclick="get_info()">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="cost"><strong>Стоимость</strong></label>
+                                <input type="number" id="cost" class="form-control" placeholder="40" required>
+                            </div>
                         </div>
-{#                 </form>#}
+                    </div>
+
+                    </div>
+
+                    <div class="form-group text-center">
+                        <input type="submit" class="btn btn-lg btn-success" value="Добавить" onclick="get_info()">
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,111 +1,103 @@
 {% extends "base.html" %}
-{% block add_sharing_tab %}<li class="nav-item active"><a class="nav-link" href="{% url 'add_sharing' %}"> Добавить точку </a></li>{% endblock %}
-{% block title %} Оформить Powerbank {% endblock %}
+
+{% block title %} Оформить заказ {% endblock %}
 
 {% block content %}
-    <style>
-        body, html{
-            width: 100%;
-            height: 85%;
-        }
-    </style>
-    <!--
-        
-        TODO: переделать интерфейс, чтобы он был user-friendly
-
-        - Изменить N/L на радиобутон
-        - Изменить поле mAh на хрень, которая забыл как называется, но выглядит так:
-          [------------|------------------]
-          100   200   300   400   500   600
-    
-    -->
     <div class="container">
         <div class="card">
             <div class="card-body">
-                <h2 class="card-title"> Вы выбрали точку: </h2>
-                <h4> {{ location }} </h4>
-{#                 <form>#}
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="order_type">Когда вам нужен Powerbank?</label>
-                                <div class="col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
-                                    <label class="btn btn-secondary">
-                                      <input type="radio" value="N" id="order_type" autocomplete="off"> Сейчас
-                                    </label>
-                                    <label class="btn btn-secondary">
-                                      <input type="radio" value="L" id="order_type" autocomplete="off"> Через 15 минут
-                                    </label>
-                                </div>
-                            </div>
-                                 <!--<input type="text" id="order_type" class="form-control" placeholder="N"
-                                       required>-->
-                            <div class="form-group col-md-6">
-                                <label for="pb_capacity">Требуемая ёмкость аккумулятора</label>
-                                <div class=" col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
-                                    {% if small %}
-                                    <label class="btn btn-secondary">
-                                        <input type="radio" value="small" id="pb_capacity" autocomplete="off"> Маленькая
-                                        <br>
-                                        <small>до 4000 mAh</small>
-                                    </label>
-                                    {% endif %}
-                                    {% if medium %}
-                                    <label class="btn btn-secondary">
-                                        <input type="radio" value="medium" id="pb_capacity" autocomplete="off"> Средняя
-                                        <br>
-                                        <small>от 4001 до 10000 mAh</small>
-                                    </label>
-                                    {% endif %}
-                                    {% if large %}
-                                    <label class="btn btn-secondary">
-                                        <input type="radio" value="large" id="pb_capacity" autocomplete="off"> Большая
-                                        <br>
-                                        <small>от 10001 mAh</small>
-                                    </label>
-                                    {% endif %}
-                                </div>
-                                <!--<input type="text" id="pb_capacity" class="form-control"
-                                       placeholder="4000" required>-->
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="pb_capacity">Тариф</label>
-                                <div class=" col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
-                                    {% for plan in plans %}
-                                    <label class="btn btn-secondary">
-                                        <input type="radio" value="{{ plan.id }}" id="plan" autocomplete="off"> {{ plan.name }}
-                                        <br>
-                                        <small>{{ plan.description }}</small>
-                                    </label>
-                                    {% endfor %}
-                                </div>
-                                <!--<input type="text" id="pb_capacity" class="form-control"
-                                   placeholder="4000" required>-->
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="pb_capacity">Кошелёк</label>
-                                <div class=" col-md-6 btn-group btn-group-toggle" data-toggle="buttons">
-                                    {% for wallet in wallets %}
-                                    <label class="btn btn-secondary">
-                                        <input type="radio" value="{{ wallet.id }}" id="wallet" autocomplete="off"> {{ wallet.name }}
-                                        <br>
-                                        <small>{{ wallet.balance }}₽</small>
-                                    </label>
-                                    {% endfor %}
-                                </div>
-                                <!--<input type="text" id="pb_capacity" class="form-control"
-                                   placeholder="4000" required>-->
+                <h2 class="card-title"><span class="text-secondary"> Выбранная точка | </span><a href="{% url 'share_page' key=location.id %}"> {{ location.address }}</a></h2>
+                    <div class="form-row">
+                        <div class="form-group col-md-6 mb-2">
+                            <label for="order_type"><strong>Когда вам нужен Powerbank?</strong></label><br>
+                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                <label class="btn btn-secondary">
+                                  <input type="radio" value="N" id="order_type" autocomplete="off"> Сейчас
+                                </label>
+                                <label class="btn btn-secondary">
+                                  <input type="radio" value="L" id="order_type" autocomplete="off"> Через 15 минут
+                                </label>
                             </div>
                         </div>
 
-                        <div class="form-group text-center">
-                            <input type="submit" class="btn btn-lg btn-outline-primary" value="Заказать" onclick="get_info()">
+                        <div class="form-group col-md-6 mb-2">
+                            <label for="myRange"><strong>Какая нужна ёмкость аккумулятора?</strong></label>
+                            <input type="range" class="custom-range" id="myRange" min="4000" max="10000" value="50">
+                            <p class="text-center">
+                                <span id="demo" class="badge badge-info display-3"></span>
+                            </p>
                         </div>
-{#                 </form>#}
+                    </div>
+                    <hr>
+
+                    <div class="form-row">
+                        <div class="form-group mb-2">
+                            <label for="pb_capacity"><strong>Тариф</strong></label>
+                            {% if request.user.is_superuser %}
+                                |
+                                <a href="{% url 'add_payment_plan' %}"> Добавить новый тариф </a>
+                            {% endif %}
+                            <br>
+                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                {% if plans|length == 0 %}
+                                    <p>
+                                        Вообще нет тарифов! Надо создать.
+                                    </p>
+                                {% else %}
+                                    {% for plan in plans %}
+                                        <label class="btn btn-secondary">
+                                            <input type="radio" value="{{ plan.id }}" id="plan" autocomplete="off"> {{ plan.name }}
+                                            <br>
+                                            <small>{{ plan.description }}</small>
+                                        </label>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pb_capacity"><strong>Кошелек</strong></label> |
+                            <a href="{% url 'add_wallet' %}"> Создать новый кошелек</a>
+                            <br>
+
+                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                {% if wallets|length == 0 %}
+                                    <p>
+                                        У Вас нет кошельков! Надо создать.
+                                    </p>
+                                {% else %}
+                                    {% for wallet in wallets %}
+                                        <label class="btn btn-secondary">
+                                            <input type="radio" value="{{ wallet.id }}" id="wallet" autocomplete="off"> {{ wallet.name }}
+                                            <br>
+                                            <small>{{ wallet.balance }}₽</small>
+                                        </label>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group text-center">
+                        <input type="submit" class="btn btn-lg btn-success" value="Заказать" onclick="get_info()">
+                    </div>
                 </div>
             </div>
         </div>
 
     <script>
+        var slider = document.getElementById("myRange");
+        var output = document.getElementById("demo");
+        output.innerHTML = slider.value + 'mAh'; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider.oninput = function() {
+          output.innerHTML = this.value + 'mAh';
+        };
+
         function get_info() {
             var pb_capacity = $('#pb_capacity:checked').val();
             var order_type = $('#order_type:checked').val();
@@ -126,7 +118,7 @@
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function (response){
-                    if (pb_capacity == undefined || order_type == undefined || payment_plan == undefined || wallet == undefined)
+                    if (pb_capacity === undefined || order_type === undefined || payment_plan === undefined || wallet === undefined)
                     {
                         alert("Заполните все поля!")
                     }
