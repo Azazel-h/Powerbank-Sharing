@@ -74,7 +74,7 @@
                 url: "/payment/add_wallet",
                 data:{
                     name: name,
-                    payment_method, payment_method,
+                    payment_method: payment_method,
                     balance: balance,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },

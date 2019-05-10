@@ -99,7 +99,7 @@
         };
 
         function get_info() {
-            var pb_capacity = $('#pb_capacity:checked').val();
+            var pb_capacity = $('#myRange').val();
             var order_type = $('#order_type:checked').val();
             var payment_plan = $('#plan:checked').val();
             var wallet = $('#wallet:checked').val();
@@ -111,10 +111,10 @@
                 type: "POST",
                 url: "/order/{{ pk }}/",
                 data:{
-                    order_type, order_type,
+                    order_type: order_type,
                     pb_capacity: pb_capacity,
                     payment_plan: payment_plan,
-                    wallet, wallet,
+                    wallet: wallet,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function (response){
