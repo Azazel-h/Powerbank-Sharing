@@ -23,10 +23,10 @@
                         <div class="card-body">
                             <h1 class="card-title">Привет, {{ user.username }}!</h1>
                             <h4 class="text-secondary"> Ваш профиль заполнен на
-                                {{ profile_progress.percentage }}!
+                                {{ profile_progress.percentage }}%!
                             </h4>
                             <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: {{ profile_progress.percentage }}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar" role="progressbar" style="width: {{ profile_progress.percentage }}%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                             <hr>
 
@@ -42,54 +42,55 @@
         </div>
         <hr>
         {% if profile_progress.percentage < 100 %}
-        <div class="card">
-            <div class="card-body">
-                <h2 class="card-title"> Заполните свой профиль </h2>
-                <hr>
-                <div class="row">
-                    {% if not profile.name %}
-                        <div class="col-md-6 mb-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <form action="{% url 'account' %}" method="POST" name="change-name">
-                                        {% csrf_token %}
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title"> Заполните свой профиль </h2>
+                    <hr>
+                    <div class="row">
+                        {% if not profile.name %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <form action="{% url 'account' %}" method="POST" name="change-name">
+                                            {% csrf_token %}
 
-                                        <div class="form-group">
-                                            <label for="input_name"> Введите Ваше настоящее имя</label>
-                                            <input type="text" class="form-control" placeholder="Ваше имя" id="input_name">
-                                        </div>
+                                            <div class="form-group">
+                                                <label for="input_name"> Введите Ваше настоящее имя</label>
+                                                <input type="text" class="form-control" placeholder="Ваше имя" id="input_name">
+                                            </div>
 
-                                        <input type="submit" class="btn btn-success" value="Изменить" onclick="change_name()">
-                                    </form>
+                                            <input type="submit" class="btn btn-success" value="Изменить" onclick="change_name()">
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    {% endif %}
+                        {% endif %}
 
-                    {% if not profile.passport or profile.passport_status == 'fail' %}
-                        <div class="col-md-6 mb-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <form action="{% url 'account' %}" method="POST" name="send-photo-with-passport" enctype="multipart/form-data">
-                                        {% csrf_token %}
-                                        <p>
-                                            В мерах безопасности нам необходимо Ваше фото с паспортом (должны быть видны и Вы,
-                                            и Ваш документ). Вы получите доступ к нашему сервису, как только модераторы одобрят
-                                            Вашу заявку. Рассматривается только последняя посылка. Спасибо за понимание!
-                                        </p>
+                        {% if not profile.passport or profile.passport_status == 'fail' %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <form action="{% url 'account' %}" method="POST" name="send-photo-with-passport" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <p>
+                                                В мерах безопасности нам необходимо Ваше фото с паспортом (должны быть видны и Вы,
+                                                и Ваш документ). Вы получите доступ к нашему сервису, как только модераторы одобрят
+                                                Вашу заявку. Рассматривается только последняя посылка. Спасибо за понимание!
+                                            </p>
 
-                                        <div class="custom-file">
-                                            {{ form }}
-                                            <label class="custom-file-label" for="customFile" id="customFileLabel"> Выберите фото </label>
-                                        </div>
+                                            <div class="custom-file">
+                                                {{ form }}
+                                                <label class="custom-file-label" for="customFile" id="customFileLabel"> Выберите фото </label>
+                                            </div>
 
-                                        <input name="submit-passport" type="submit" value="Отправить" class="btn btn-success">
-                                    </form>
+                                            <input name="submit-passport" type="submit" value="Отправить" class="btn btn-success">
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    {% endif %}
-                </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
 
                 <div class="card">
                     <div class="card-body">
@@ -145,7 +146,6 @@
                 </div>
             </div>
         </div>
-        {% endif %}
 
         {% if user.is_superuser %}
             <hr>
@@ -205,7 +205,7 @@
                                 {% for item in share %}
                                     <tr>
                                         <th scope="row">{{ item.id }}</th>
-                                        <td><a href="{% url 'share_page' pk=item.id %}">{{ item.title }}</a></td>
+                                        <td><a href="{% url 'share_page' key=item.id %}">{{ item.title }}</a></td>
                                         <td>{{ item.address }}</td>
                                         <td>{{ item.time }}</td>
                                         <td><button class="btn btn-danger btn-sm"> Удалить </button></td>
@@ -216,43 +216,10 @@
                             </table>
                         </div>
                     </div>
-
-{#                    <div class="row">#}
-{#                        <div class="col-md-6">#}
-{#                            <div class="card">#}
-{#                                <div class="card-body">#}
-{#                                    <h3 class="card-title">Powerbank'и</h3>#}
-{#                                    <table class="table">#}
-{#                                        <thead class="thead-dark">#}
-{#                                            <tr>#}
-{#                                                <td><b>ID</b></td>#}
-{#                                                <td><b>Статус</b></td>#}
-{#                                                <td><b>Значение</b></td>#}
-{#                                                <td><button class="btn btn-primary" role="button">Удалить все</button></td>#}
-{#                                                <td><b></b></td>#}
-{#                                            </tr>#}
-{#                                        </thead>#}
-{#                                        <tbody>#}
-{#                                        {% for item in pb %}#}
-{#                                            <tr>#}
-{#                                                <td><a href="#">{{ item.id }}</a></td>#}
-{#                                                <td>{{ item.status }}</td>#}
-{#                                                <td>{{ item.value }}</td>#}
-{#                                                <td><button class="btn btn-primary" role="button">Удалить</button></td>#}
-{#                                                <td><button class="btn btn-primary" role="button">Изменить</button></td>#}
-{#                                            </tr>#}
-{#                                        {% endfor %}#}
-{#                                        </tbody>#}
-{#                                    </table>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                        <div class="col-md-6">#}
-{#                        </div>#}
                 </div>
             </div>
         {% endif %}
-{#    </div>#}
+    </div>
 
     <script>
         function change_name() {
@@ -269,6 +236,7 @@
             })
         }
     </script>
+
     {% if not profile.passport %}
         {% load static %}
         <script src="{% static 'js/changeFileInputLabel.js' %}"></script>

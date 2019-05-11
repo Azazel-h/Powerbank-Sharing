@@ -18,7 +18,12 @@
                     <br>
                     <strong>Средство оплаты:</strong> {{ wallet }}      
                 </p>
-                <a class="btn btn-primary btn-lg btn-block" href="{% url 'scan' %}">Отдать Powerbank</a>
+
+                <div class="row">
+                    <div class="col-md-6 offset-md-3">
+                        <a class="btn btn-primary btn-lg btn-block" href="{% url 'scan' %}">Отдать Powerbank</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

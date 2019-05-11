@@ -31,7 +31,7 @@ def ordering(request, key):
         return unverified(request)
     if get_last_order(profile).progress == 'applied':
         return redirect('/session')
-    ctx = {"location": share.address, "small": False,
+    ctx = {"location": share, "small": False,
            "medium": False, "large": False}
     for power in Powerbank.objects.filter(location=share.id, status='free'):
         if power.capacity <= 4000:
@@ -127,6 +127,9 @@ def pending(request):
         return unverified(request)
     order = get_last_order(get_profile(request.user))
     rem = remaining_min(order)
+
+    print(order.progress)
+
     if rem is not None:
         if rem <= 0:
             fail_order(order)

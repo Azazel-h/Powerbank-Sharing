@@ -32,7 +32,7 @@ def account(request):
         'user': request.user,
         'profile': profile,
         'profile_progress':
-        Profile.get_progress_complete_account(request.user),
+            Profile.get_progress_complete_account(request.user),
         'free_power_banks': powerbank_percentage(),
         'pb': Powerbank.get_all(),
         'share': Share.get_all()
