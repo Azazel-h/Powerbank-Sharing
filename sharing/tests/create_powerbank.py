@@ -185,9 +185,9 @@ class TestSharePage(TestCase):
 
         client.login(username='xenon', password='23452345')
 
-        response = client.get('/share/1')
+        response = client.get('/share/1/')
 
-        self.assertEqual(301, response.status_code)
+        self.assertEqual(200, response.status_code)
 
     def test_login_admin_share_page(self):
         """
@@ -198,8 +198,19 @@ class TestSharePage(TestCase):
 
         admin.login(username='root', password='rootpass')
 
-        admin.post('/cheat')
-
-        response = admin.get('/share/1')
+        response = admin.get('/share/1/')
 
         self.assertEqual(200, response.status_code)
+
+    def test_login_go_to__non_existent_station(self):
+        """
+        Вход на страницу не существующей станции
+        :return:
+        """
+        admin = Client()
+
+        admin.login(username='root', password='rootpass')
+
+        response = admin.get('/share/2/')
+
+        self.assertEqual(302, response.status_code)
