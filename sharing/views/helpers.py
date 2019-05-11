@@ -122,26 +122,6 @@ def seed_points():
                       qrcode='777777', free_pbs=0)
         share.save()
 
-
-def seed_pbs():
-    """
-
-    :return:
-    """
-    i = 0
-    while i < 120:
-        kiwi = {}
-        kiwi['capacity'] = randint(1, 99999)
-        kiwi['location'] = randint(1, 69)
-        kiwi['status'] = 'free'
-        kiwi['code'] = 'wtf is that'
-        power = Powerbank(capacity=randint(1, 99999),
-                          location=randint(1, 69),
-                          status='free',
-                          code='wtf is that')
-        power.save()
-
-
 def reset_sessions_and_orders():
     """
 
