@@ -127,6 +127,9 @@ def pending(request):
         return unverified(request)
     order = get_last_order(get_profile(request.user))
     rem = remaining_min(order)
+
+    print(order.progress)
+
     if rem is not None:
         if rem <= 0:
             fail_order(order)

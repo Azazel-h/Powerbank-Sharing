@@ -91,18 +91,28 @@
     <script>
         var slider = document.getElementById("myRange");
         var output = document.getElementById("demo");
-        output.innerHTML = slider.value + 'mAh'; // Display the default slider value
+        output.innerHTML = slider.value + 'mAh';
 
-        // Update the current slider value (each time you drag the slider handle)
         slider.oninput = function() {
           output.innerHTML = this.value + 'mAh';
         };
 
         function get_info() {
-            var pb_capacity = $('#myRange').val();
-            var order_type = $('#order_type:checked').val();
-            var payment_plan = $('#plan:checked').val();
-            var wallet = $('#wallet:checked').val();
+            let pb_capacity_value = $('#myRange').val();
+            let pb_capacity = '';
+
+            if (pb_capacity_value <= 4000){
+                pb_capacity = 'small'
+            } else if (pb_capacity_value > 4000 && pb_capacity_value <= 10000){
+                pb_capacity = 'medium'
+            } else{
+                pb_capacity = 'large'
+            }
+
+
+            let order_type = $('#order_type:checked').val();
+            let payment_plan = $('#plan:checked').val();
+            let wallet = $('#wallet:checked').val();
             send(order_type, pb_capacity, payment_plan, wallet)
         }
 
@@ -118,18 +128,14 @@
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function (response){
-                    if (pb_capacity === undefined || order_type === undefined || payment_plan === undefined || wallet === undefined)
-                    {
+                    if (pb_capacity === undefined || order_type === undefined || payment_plan === undefined || wallet === undefined) {
                         alert("Заполните все поля!")
                     }
-                    else
-                    {
-                        if (order_type === "N")
-                        {
+                    else {
+                        if (order_type === "N") {
                             window.location.href = "../../scan"
                         }
-                        else if (order_type === "L")
-                        {
+                        else if (order_type === "L") {
                             window.location.href = "../../pending"
                         }
                     }

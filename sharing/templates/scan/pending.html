@@ -14,14 +14,19 @@
                     <br>
                     <strong>Дата и время бронирования:</strong> {{ timestamp }}
                     <br>
-                    <strong>Тариф</strong> {{ plan }}
+                    <strong>Тариф:</strong> {{ plan }}
                     <br>
                     <strong>Средство оплаты:</strong> {{ wallet }}
                     <br>
-                    До окончания бронирования <strong>{{ remaining }}</strong> минут.
+                    До окончания бронирования <strong>{{ remaining }} минут</strong>.
                 </p>
-                <a class="btn btn-primary btn-lg btn-block" href="{% url 'scan' %}">Забрать Powerbank</a>
-                <a class="btn btn-danger btn-lg btn-block" href="{% url 'cancelled' %}">Отменить бронирование</a>
+
+                <div class="row">
+                    <div class="col-md-6 offset-md-3">
+                        <a class="btn btn-primary btn-lg btn-block" href="{% url 'scan' %}">Забрать Powerbank</a>
+                        <a class="btn btn-danger btn-lg btn-block" href="{% url 'cancelled' %}">Отменить бронирование</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
