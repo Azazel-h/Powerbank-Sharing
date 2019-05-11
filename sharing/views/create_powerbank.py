@@ -52,7 +52,7 @@ def add_pb(request):
         code = random()
         location = request.POST.get('location')
         capacity = request.POST.get('capacity')
-        new_pb = Powerbank(code=code, location=location,
+        new_pb = Powerbank(location=location,
                            capacity=capacity, status='free')
         share = Share.objects.get(id=location)
         share.free_pbs += 1

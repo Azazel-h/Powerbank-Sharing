@@ -73,7 +73,7 @@ class TestCheat(TestCase):
     def test_reset_orders(self):
         admin = Client()
         admin.login(username='root', password='rootpass')
-        p = Powerbank.objects.create(status='', capacity='20000', location='1')
+        p = Powerbank.objects.create(status='free', capacity='20000', location='1')
         s = Share.objects.create(free_pbs=1, crds_lot=1, crds_lat=1)
         Order.objects.create(progress='applied', share=s, pb=p)
         admin.post('/debug/reset_orders')
