@@ -25,15 +25,16 @@
                 Эта станция находится по адресу <em>{{ share.address }}</em>.
             </p>
             {% if amt == 0 %}
-            Нет доступных устройств.
+                Нет доступных устройств.
             {% elif amt == 1 %}
-            Доступно 1 устройство ёмкостью {{ max_cap }} mAh
+                Доступно 1 устройство ёмкостью {{ max_cap }} mAh
             {% else %}
-            Доступно {{ amt }} устройств ёмкостью от {{ min_cap }} mAh до {{ max_cap }} mAh.
+                Доступно {{ amt }} устройств ёмкостью от {{ min_cap }} mAh до {{ max_cap }} mAh.
             {% endif %}
 
+            <br>
             {% if amt > 0 %}
-            <a class="btn btn-primary" href="{% url 'ordering' key=share.id %}">Забронировать...</a>
+                <a class="btn btn-primary mb-2" href="{% url 'ordering' key=share.id %}"> Забронировать </a>
             {% endif %}
 
             {% if user.is_superuser %}
