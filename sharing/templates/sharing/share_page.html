@@ -33,7 +33,7 @@
             {% endif %}
 
             {% if amt > 0 %}
-            <a class="btn btn-primary" href="{% url 'ordering' pk=share.id %}">Забронировать...</a>
+            <a class="btn btn-primary" href="{% url 'ordering' key=share.id %}">Забронировать...</a>
             {% endif %}
 
             {% if user.is_superuser %}

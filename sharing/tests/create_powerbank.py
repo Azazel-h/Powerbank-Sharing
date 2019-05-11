@@ -141,3 +141,65 @@ class TestAddPowerbank(TestCase):
         response = admin.post('/sharing/add_pb', data)
 
         self.assertEqual('OK', response.reason_phrase)
+
+
+class TestSharePage(TestCase):
+    """
+    Класс для тестирования функции share_page
+    """
+    def setUp(self):
+        """
+        Начальные параметры
+        :return:
+        """
+        user = User.objects.create_user(username='xenon',
+                                        email='test@ya.ru',
+                                        password='23452345')
+        Profile.objects.create(user=user, name='xenon')
+
+        superuser = User.objects.create_superuser(username='root',
+                                                  email='root@ya.ru',
+                                                  password='rootpass')
+        Profile.objects.create(user=superuser, name='root')
+
+        adm = Client()
+
+        adm.login(username='root', password='rootpass')
+
+        data = {
+            'title': 'Main',
+            'address': 'Moscow, Russia',
+            'qrcode': 'Hello, world!',
+            'ip': '127.0.0.1',
+            'crds': '[50.450441,30.52355]'
+        }
+
+        adm.post('/sharing/add', data)
+
+    def test_login_user_share_page(self):
+        """
+        Вход на страницу с аккаунта пользователя
+        :return:
+        """
+        client = Client()
+
+        client.login(username='xenon', password='23452345')
+
+        response = client.get('/share/1')
+
+        self.assertEqual(301, response.status_code)
+
+    def test_login_admin_share_page(self):
+        """
+        Вход на страницу с аккаунта администратора
+        :return:
+        """
+        admin = Client()
+
+        admin.login(username='root', password='rootpass')
+
+        admin.post('/cheat')
+
+        response = admin.get('/share/1')
+
+        self.assertEqual(200, response.status_code)

@@ -40,7 +40,7 @@ def ordering(request, key):
             ctx["medium"] = True
         if power.capacity >= 10001:
             ctx["large"] = True
-    ctx["pk"] = key
+    ctx["key"] = key
     wallets_id = list(map(int, profile.wallets.split()))
     wallets = []
     for wid in wallets_id:
