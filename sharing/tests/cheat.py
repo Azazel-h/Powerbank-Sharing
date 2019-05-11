@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
-from sharing.models import Share, Profile, Order, PaymentPlan
+from sharing.models import Share, Profile, Order, PaymentPlan, Powerbank
 
 class TestCheat(TestCase):
     def setUp(self):
@@ -70,18 +70,17 @@ class TestCheat(TestCase):
         response = user.post('/debug/display_plans')
         self.assertEqual(302, response.status_code)
 
-    #Пока не работает
     def test_reset_orders(self):
         admin = Client()
         admin.login(username='root', password='rootpass')
-        Order.objects.create(progress='applied')
-        print(Order.objects.all())
+        p = Powerbank.objects.create(status='free', capacity='20000', location='1')
+        s = Share.objects.create(free_pbs=1, crds_lot=1, crds_lat=1)
+        Order.objects.create(progress='applied', share=s, pb=p)
         admin.post('/debug/reset_orders')
-        self.assertEqual(Order.objects.all().count(), 0)
+        self.assertEqual(Order.objects.get(id=1).progress, 'failed')
 
     def test_reset_orders_vlidation(self):
         user = Client()
         user.login(username='xenon', password='23452345')
         response = user.post('/debug/reset_orders')
         self.assertEqual(302, response.status_code)
-
