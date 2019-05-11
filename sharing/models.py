@@ -70,7 +70,7 @@ class Profile(models.Model):
         res = [x for x in list(date.values()) if x not in default]
         return {
             'num-completed': len(res),
-            'percentage': str((100 * len(res) // len(default))) + '%'
+            'percentage': (100 * len(res) // len(default))
         }
 
 
