@@ -11,10 +11,10 @@
 """
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from sharing.models import Share, Powerbank, Wallet, PaymentPlan, Order
+from sharing.models import Share, Powerbank, PaymentPlan, Order
 from sharing.views.scan import unverified
 from sharing.views.helpers import get_profile, get_last_order, \
-     remaining_min, fail_order
+     remaining_min, fail_order, has_active_subscription
 
 
 @login_required
@@ -27,7 +27,8 @@ def ordering(request, key):
     """
     profile = get_profile(request.user)
     share = Share.objects.get(id=key)
-    if not profile.active_mail or profile.passport_status != 'success':
+    if not profile.active_mail or profile.passport_status != 'success' \
+       or not has_active_subscription(profile):
         return unverified(request)
     if get_last_order(profile).progress == 'applied':
         return redirect('/session')
@@ -41,14 +42,7 @@ def ordering(request, key):
         if power.capacity >= 10001:
             ctx["large"] = True
     ctx["pk"] = key
-    wallets_id = list(map(int, profile.wallets.split()))
-    wallets = []
-    for wid in wallets_id:
-        cwal = Wallet.objects.filter(id=wid)[0]
-        if cwal.status == 'active':
-            wallets.append(cwal)
     ctx["plans"] = PaymentPlan.objects.all()
-    ctx["wallets"] = wallets
     it_post(request, key, share, ctx)
     return render(request, 'sharing/order.html', context=ctx)
 
@@ -66,9 +60,7 @@ def it_post(request, key, share, ctx):
         order_type = request.POST.get('order_type')
         pb_capacity = request.POST.get('pb_capacity')
         payment_plan_id = request.POST.get('payment_plan')
-        wallet_id = request.POST.get('wallet')
         payment_plan = PaymentPlan.objects.filter(id=payment_plan_id)[0]
-        wallet = Wallet.objects.filter(id=wallet_id)[0]
         if order_type is not None and pb_capacity is not None:
             cands = Powerbank.objects.all().filter(location=key, status='free')
             cand = None
@@ -87,8 +79,7 @@ def it_post(request, key, share, ctx):
                     cand = power
             if cand is not None:
                 if order_type == 'N':
-                    order = Order(wallet=wallet,
-                                  payment_plan=payment_plan,
+                    order = Order(payment_plan=payment_plan,
                                   order_type='immediate',
                                   pb=cand,
                                   share=share,
@@ -96,8 +87,7 @@ def it_post(request, key, share, ctx):
                                   reservation_time=2,
                                   end_share=share)
                 else:
-                    order = Order(wallet=wallet,
-                                  payment_plan=payment_plan,
+                    order = Order(payment_plan=payment_plan,
                                   order_type='hold',
                                   pb=cand,
                                   share=share,
@@ -139,8 +129,7 @@ def pending(request):
            'timestamp': str(order.timestamp),
            'remaining': int(remaining_min(order)),
            'address': order.share.address,
-           'plan': order.payment_plan.name,
-           'wallet': order.wallet.name}
+           'plan': order.payment_plan.name}
     return render(request, 'scan/pending.html', context=ctx)
 
 

@@ -10,8 +10,8 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from sharing.models import Profile, Share
-from sharing.views.helpers import get_last_order, get_profile, count_profit, \
-    end_order, order_duration
+from sharing.views.helpers import get_last_order, get_profile, \
+    end_order, order_duration, has_active_subscription
 
 
 @login_required
@@ -57,6 +57,8 @@ def unverified(request):
         reasons.append('Не активирован почтовый адрес')
     if not profile.passport_status == 'success':
         reasons.append('Не подтверждён паспорт')
+    if not has_active_subscription(profile):
+        reasons.append('Нет активных подписок')
     return render(request, 'scan/unverified.html', {'reasons': reasons})
 
 
@@ -80,11 +82,9 @@ def session(request):
         # requests.get('http://' + order.share.ip + '/')
         power.status = 'charging'
     elif power.status == 'occupied':
-        ctx['to_pay'] = count_profit(order)
         ctx['capacity'] = power.capacity
         ctx['timestamp'] = order.timestamp
         ctx['payment_plan'] = order.payment_plan.name
-        ctx['wallet'] = order.wallet.name
     power.save()
     return render(request, 'scan/session.html', ctx)
 
@@ -98,19 +98,10 @@ def end(request):
     order = get_last_order(profile)
     if order.progress != 'ended':
         return redirect('/')
-    profit = count_profit(order)
-    wal = order.wallet
-    wal.balance -= profit
-    if wal.balance < 0:
-        wal.status = 'suspended'
-    wal.save()
     ctx = {
-        'to_pay': profit,
         'start': order.share.address,
         'end': order.end_share.address,
         'duration': order_duration(order),
-        'wallet': order.wallet.name,
-        'payment_plan': order.payment_plan.name,
-        'current_balance': wal.balance
+        'payment_plan': order.payment_plan.name
     }
     return render(request, 'scan/end.html', ctx)

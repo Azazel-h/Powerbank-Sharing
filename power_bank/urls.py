@@ -57,8 +57,7 @@ urlpatterns = [
 
     path('payment/add_payment_plan',
          views.add_payment_plan, name='add_payment_plan'),
-    path('payment/add_wallet',
-         views.add_wallet, name='add_wallet')
+    path('subscribe', views.subscribe, name='subscribe')
 ]
 
 if settings.DEBUG:
