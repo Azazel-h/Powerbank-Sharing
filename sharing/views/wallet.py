@@ -7,6 +7,7 @@
         - models
         - views.helpers
 """
+import datetime
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from sharing.models import PaymentPlan
@@ -44,11 +45,15 @@ def subscribe(request):
     :return:
     """
     profile = get_profile(request.user)
+    plans = PaymentPlan.objects.all()
     if request.method == 'POST':
         payment_plan_id = int(request.POST.get('payment_plan_id'))
         payment_plan = PaymentPlan.objects.filter(id=payment_plan_id)
         if payment_plan is not None:
-            profile.payment_plan = payment_plan
+            profile.payment_plan = payment_plan[0]
+            now = datetime.datetime.now(datetime.timezone.utc)
+            profile.payment_plan_activation_time = now
             profile.save()
         return HttpResponse('Подписка привязана')
-    return render(request, 'payment/subscribe.html')
+    ctx = {"plans": plans}
+    return render(request, 'payment/subscribe.html', context=ctx)

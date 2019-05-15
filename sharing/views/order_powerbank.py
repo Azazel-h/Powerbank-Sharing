@@ -34,15 +34,18 @@ def ordering(request, key):
         return redirect('/session')
     ctx = {"location": share, "small": False,
            "medium": False, "large": False}
-    for power in Powerbank.objects.filter(location=share.id, status='free'):
-        if power.capacity <= 4000:
-            ctx["small"] = True
-        if 4001 <= power.capacity <= 10000:
-            ctx["medium"] = True
-        if power.capacity >= 10001:
-            ctx["large"] = True
+    free_pbs = Powerbank.objects.filter(location=share.id, status='free')
+    min_cap = free_pbs[0].capacity
+    max_cap = free_pbs[0].capacity
+    for powerbank in free_pbs:
+        if powerbank.capacity > max_cap:
+            max_cap = powerbank.capacity
+        if powerbank.capacity < min_cap:
+            min_cap = powerbank.capacity
     ctx["pk"] = key
     ctx["plans"] = PaymentPlan.objects.all()
+    ctx["min_cap"] = min_cap
+    ctx["max_cap"] = max_cap
     it_post(request, key, share, ctx)
     return render(request, 'sharing/order.html', context=ctx)
 
@@ -117,9 +120,6 @@ def pending(request):
         return unverified(request)
     order = get_last_order(get_profile(request.user))
     rem = remaining_min(order)
-
-    print(order.progress)
-
     if rem is not None:
         if rem <= 0:
             fail_order(order)

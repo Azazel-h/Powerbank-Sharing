@@ -81,7 +81,7 @@ class Profile(models.Model):
     passport_status = models.CharField(max_length=216, default='empty')
     payment_plan = models.ForeignKey(PaymentPlan, on_delete=models.SET_NULL,
                                      null=True)
-    payment_plan_activation_time = models.TimeField(auto_now_add=True)
+    payment_plan_activation_time = models.DateTimeField(auto_now_add=True)
     hold = models.ForeignKey(Powerbank, on_delete=models.SET_NULL, null=True)
 
     @staticmethod
