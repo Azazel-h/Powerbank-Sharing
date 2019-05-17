@@ -14,8 +14,12 @@ stages:
   
 testing:
   stage: test
-  before_script:
-  - pip install -r requirements.txt
+  script:
+    - python manage.py migrate
+    - python manage.py test
+
+coverage:
+  stage: test
   script:
   - coverage run manage.py test
   - coverage report --omit=manage.py
@@ -24,8 +28,7 @@ testing:
   - mv htmlcov public/coverage
   artifacts:
     paths:
-      - public/coverage
-
+      - public/coverage  
   
 pylint: 
   stage: style
@@ -36,10 +39,3 @@ pep8:
   stage: style
   script:
     - pycodestyle .
-
-coverage:
-  stage: test
-  script: 
-    - coverage run manage.py test
-    - coverage report
-
