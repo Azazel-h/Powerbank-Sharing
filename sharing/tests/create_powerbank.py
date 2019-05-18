@@ -1,3 +1,7 @@
+"""
+    Начальные параметры
+    :return:
+"""
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from sharing.models import Profile

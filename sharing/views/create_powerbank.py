@@ -8,7 +8,6 @@
     - json
 """
 import json
-from random import random
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from sharing.models import Share, Powerbank
@@ -49,7 +48,6 @@ def add_pb(request):
         return redirect('/')
 
     if request.method == 'POST':
-        code = random()
         location = request.POST.get('location')
         capacity = request.POST.get('capacity')
         new_pb = Powerbank(location=location,
