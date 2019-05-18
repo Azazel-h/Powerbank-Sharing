@@ -36,8 +36,6 @@ class TestCheat(TestCase):
         admin.login(username='root', password='rootpass')
         profile = Profile.objects.get(id=2)
         self.assertEqual(profile.passport_status, 'empty')
-        self.assertEqual(profile.active_mail, True)
-        self.assertEqual(profile.name, 'Sbeve Sbeve')
 
     def test_make_verified_validation(self):
         """
