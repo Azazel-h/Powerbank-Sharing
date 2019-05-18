@@ -10,8 +10,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from sharing.models import Share, Profile, Order, PaymentPlan
-from sharing.views.helpers import get_profile, reset_sessions_and_orders, \
-     seed_pbs, seed_points
+from sharing.views.helpers import get_profile, reset_sessions_and_orders
 
 
 @login_required
@@ -25,7 +24,6 @@ def make_verified(request):
         return redirect('/error/rights')
     profile = Profile.objects.get(user=request.user)
     profile.passport_status = 'success'
-    profile.session_status = 'inactive'
     profile.active_mail = True
     profile.name = 'Sbeve Sbeve'
     profile.save()
@@ -84,18 +82,4 @@ def reset_orders(request):
     if not request.user.is_superuser:
         return redirect('/error/rights')
     reset_sessions_and_orders()
-    return redirect('/')
-
-
-@login_required
-def seed(request):
-    """
-    Заполнение моделей
-    :param request:
-    :return:
-    """
-    if not request.user.is_superuser:
-        return redirect('/error/rights')
-    seed_points()
-    seed_pbs()
     return redirect('/')

@@ -15,7 +15,6 @@ class Powerbank(models.Model):
             occupied - используется кем-то
             charging - заряжается
     """
-    code = models.CharField(max_length=256)
     capacity = models.IntegerField()
     location = models.IntegerField()
     status = models.CharField(max_length=256)

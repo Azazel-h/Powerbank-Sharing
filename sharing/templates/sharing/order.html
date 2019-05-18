@@ -94,7 +94,7 @@
         function send(order_type, pb_capacity, payment_plan) {
             $.ajax({
                 type: "POST",
-                url: "/order/{{ pk }}/",
+                url: "/order/{{ key }}/",
                 data:{
                     order_type: order_type,
                     pb_capacity: pb_capacity,

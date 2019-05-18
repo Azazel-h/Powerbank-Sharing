@@ -1,15 +1,6 @@
-"""
-Модули:
-    - django:
-        - test
-        - contrib.auth.models
-    - sharing:
-        - models
-"""
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from sharing.models import Profile
-
 
 class TestUser(TestCase):
     """

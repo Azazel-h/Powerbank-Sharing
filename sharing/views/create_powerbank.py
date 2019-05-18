@@ -52,7 +52,7 @@ def add_pb(request):
         code = random()
         location = request.POST.get('location')
         capacity = request.POST.get('capacity')
-        new_pb = Powerbank(code=code, location=location,
+        new_pb = Powerbank(location=location,
                            capacity=capacity, status='free')
         share = Share.objects.get(id=location)
         share.free_pbs += 1
@@ -84,6 +84,8 @@ def share_page(request, key):
                 max_cap = power.capacity
             if power.capacity < min_cap:
                 min_cap = power.capacity
+    if int(key) > len(Share.objects.all()):
+        return redirect('404')
     context = {
         'share': Share.objects.get(id=key),
         'min_cap': min_cap,
