@@ -163,7 +163,7 @@ def reset_sessions_and_orders():
 
 def count_profit(order):
     """
-
+    Подсчет прибыли (DEPRECATED)
     :param order:
     :return:
     """
@@ -173,3 +173,18 @@ def count_profit(order):
     now = datetime.datetime.now(datetime.timezone.utc)
     cost = order.payment_plan.cost
     return int((now - when_ordered).total_seconds() / 60.0 * cost)
+
+
+def has_active_subscription(profile):
+    """
+    Проверка наличия активированной подписки
+    :param profile:
+    :return:
+    """
+    if profile.payment_plan is None:
+        return False
+    when_ordered = profile.payment_plan_activation_time
+    deadline = when_ordered + \
+        datetime.timedelta(days=profile.payment_plan.duration)
+    now = datetime.datetime.now(datetime.timezone.utc)
+    return (deadline - now).total_seconds() > 0

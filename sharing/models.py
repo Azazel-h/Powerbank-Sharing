@@ -28,6 +28,40 @@ class Powerbank(models.Model):
         return Powerbank.objects.all()
 
 
+class PaymentPlan(models.Model):
+    """
+    cost - стоимость подписки
+    duration - длительность в днях
+
+    class Wallet(models.Model):
+    '''
+    status:
+    active - кошелёк в нормальном состоянии
+    suspended - заморожен
+    (есть задолженность, по её устранению кошелёк снова активен)
+    blocked - заблокирован
+    (нельзя восстановить этот кошелёк)
+    infinite - бесконечный
+
+    payment_method:
+    promo - деньги даны в подарок
+    banking - банковская карта
+    cash - наличные
+    crypto - крипта
+    other - другое (хммм)
+    '''
+    name = models.CharField(max_length=128, default='Кошелёк')
+    balance = models.FloatField(default=0.0)
+    status = models.CharField(max_length=128, default='active')
+    payment_method = models.CharField(max_length=128, default='promo')
+    """
+    name = models.CharField(max_length=128, default='Обычная')
+    description = models.CharField(max_length=512,
+                                   default='Самая обычная подписка.')
+    cost = models.FloatField(default=0.0)
+    duration = models.IntegerField(default=7)
+
+
 class Profile(models.Model):
     """
     passport_status:
@@ -36,9 +70,7 @@ class Profile(models.Model):
     success - фотография одобрена, проверка прошла успешно
     fail - фотография не одобрена, не прошла проверку
 
-    wallets: string, в котором перечислены id кошельков из модели Wallet
-    payment_plans: string, в котором перечислены id доступных
-    планов оплаты из модели PaymentPlan
+    payment_plan - подписка пользователя
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=512, null=True)
@@ -46,9 +78,9 @@ class Profile(models.Model):
     photo = models.FileField(upload_to='users/')
     passport = models.FileField(upload_to='passports/')
     passport_status = models.CharField(max_length=216, default='empty')
-    wallets = models.CharField(max_length=512, default='')
-    payment_plans = models.CharField(max_length=512, default='')
-
+    payment_plan = models.ForeignKey(PaymentPlan, on_delete=models.SET_NULL,
+                                     null=True)
+    payment_plan_activation_time = models.DateTimeField(auto_now_add=True)
     hold = models.ForeignKey(Powerbank, on_delete=models.SET_NULL, null=True)
 
     @staticmethod
@@ -103,42 +135,6 @@ class Share(models.Model):
         return Share.objects.all()
 
 
-class Wallet(models.Model):
-    """
-    status:
-    active - кошелёк в нормальном состоянии
-    suspended - заморожен
-    (есть задолженность, по её устранению кошелёк снова активен)
-    blocked - заблокирован
-    (нельзя восстановить этот кошелёк)
-    infinite - бесконечный
-
-    payment_method:
-    promo - деньги даны в подарок
-    banking - банковская карта
-    cash - наличные
-    crypto - крипта
-    other - другое (хммм)
-    """
-    name = models.CharField(max_length=128, default='Кошелёк')
-    balance = models.FloatField(default=0.0)
-    status = models.CharField(max_length=128, default='active')
-    payment_method = models.CharField(max_length=128, default='promo')
-
-
-class PaymentPlan(models.Model):
-    """
-    payment_type:
-    perminute - поминутная оплата
-    instant - мгновенная
-    """
-    name = models.CharField(max_length=128, default='Обычный')
-    description = models.CharField(max_length=512,
-                                   default='Самый обычный тариф.')
-    payment_type = models.CharField(max_length=128, default='perminute')
-    cost = models.FloatField(default=0.0)
-
-
 class Order(models.Model):
     """
     order_type: hold  - отложенный заказ (бронирование)
@@ -162,7 +158,6 @@ class Order(models.Model):
     reservation_time = models.IntegerField(default=15)
     payment_plan = models.ForeignKey(PaymentPlan, on_delete=models.SET_NULL,
                                      null=True)
-    wallet = models.ForeignKey(Wallet, on_delete=models.SET_NULL, null=True)
     end_share = models.ForeignKey(Share, on_delete=models.SET_NULL,
                                   null=True,
                                   related_name='end_share')

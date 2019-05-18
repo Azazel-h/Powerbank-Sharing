@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %} Подписаться {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="form-group mb-2">
+                        <label for="pb_capacity"><strong>Выберите план</strong></label>
+                        {% if request.user.is_superuser %}
+                            |
+                            <a href="{% url 'add_payment_plan' %}"> Добавить подписку </a>
+                        {% endif %}
+                        <br>
+                        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                            {% if plans|length == 0 %}
+                                <p>
+                                    Вообще нет подписок! Надо создать.
+                                </p>
+                            {% else %}
+                                {% for plan in plans %}
+                                    <label class="btn btn-secondary">
+                                        <input type="radio" value="{{ plan.id }}" id="plan" autocomplete="off"> {{ plan.name }}
+                                        <br>
+                                        <small>{{ plan.description }}</small>
+                                    </label>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                {% if plans|length > 0 %}
+                <div class="form-group text-center">
+                    <input type="submit" class="btn btn-lg btn-success" value="Подписаться" onclick="get_info()">
+                </div>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+
+    <script>
+        function get_info() {
+            let payment_plan_id = $('#plan:checked').val();
+            send(payment_plan_id)
+        }
+
+        function send(payment_plan_id) {
+            $.ajax({
+                type: "POST",
+                url: "/subscribe",
+                data:{
+                    payment_plan_id: payment_plan_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response){
+                    if (payment_plan_id === undefined) {
+                        alert("Заполните все поля!")
+                    }
+                    else {
+                        window.location.href = "../../"
+                    }
+                }
+            })
+        }
+    </script>
+{% endblock %}

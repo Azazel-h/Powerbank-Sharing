@@ -22,7 +22,7 @@
 
                         <div class="form-group col-md-6 mb-2">
                             <label for="myRange"><strong>Какая нужна ёмкость аккумулятора?</strong></label>
-                            <input type="range" class="custom-range" id="myRange" min="4000" max="10000" value="50">
+                            <input type="range" class="custom-range" id="myRange" min="{{ min_cap }}" max="{{ max_cap }}" value="50">
                             <p class="text-center">
                                 <span id="demo" class="badge badge-info display-3"></span>
                             </p>
@@ -32,16 +32,16 @@
 
                     <div class="form-row">
                         <div class="form-group mb-2">
-                            <label for="pb_capacity"><strong>Тариф</strong></label>
+                            <label for="pb_capacity"><strong>Подписка</strong></label>
                             {% if request.user.is_superuser %}
                                 |
-                                <a href="{% url 'add_payment_plan' %}"> Добавить новый тариф </a>
+                                <a href="{% url 'add_payment_plan' %}"> Добавить подписку </a>
                             {% endif %}
                             <br>
                             <div class="btn-group btn-group-toggle" data-toggle="buttons">
                                 {% if plans|length == 0 %}
                                     <p>
-                                        Вообще нет тарифов! Надо создать.
+                                        Вообще нет подписок! Надо создать.
                                     </p>
                                 {% else %}
                                     {% for plan in plans %}
@@ -56,30 +56,6 @@
                         </div>
                     </div>
                     <hr>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="pb_capacity"><strong>Кошелек</strong></label> |
-                            <a href="{% url 'add_wallet' %}"> Создать новый кошелек</a>
-                            <br>
-
-                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                {% if wallets|length == 0 %}
-                                    <p>
-                                        У Вас нет кошельков! Надо создать.
-                                    </p>
-                                {% else %}
-                                    {% for wallet in wallets %}
-                                        <label class="btn btn-secondary">
-                                            <input type="radio" value="{{ wallet.id }}" id="wallet" autocomplete="off"> {{ wallet.name }}
-                                            <br>
-                                            <small>{{ wallet.balance }}₽</small>
-                                        </label>
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="form-group text-center">
                         <input type="submit" class="btn btn-lg btn-success" value="Заказать" onclick="get_info()">
@@ -112,11 +88,10 @@
 
             let order_type = $('#order_type:checked').val();
             let payment_plan = $('#plan:checked').val();
-            let wallet = $('#wallet:checked').val();
-            send(order_type, pb_capacity, payment_plan, wallet)
+            send(order_type, pb_capacity, payment_plan)
         }
 
-        function send(order_type, pb_capacity, payment_plan, wallet) {
+        function send(order_type, pb_capacity, payment_plan) {
             $.ajax({
                 type: "POST",
                 url: "/order/{{ key }}/",
@@ -124,11 +99,10 @@
                     order_type: order_type,
                     pb_capacity: pb_capacity,
                     payment_plan: payment_plan,
-                    wallet: wallet,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function (response){
-                    if (pb_capacity === undefined || order_type === undefined || payment_plan === undefined || wallet === undefined) {
+                    if (pb_capacity === undefined || order_type === undefined || payment_plan === undefined) {
                         alert("Заполните все поля!")
                     }
                     else {

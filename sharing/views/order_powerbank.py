@@ -11,10 +11,10 @@
 """
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from sharing.models import Share, Powerbank, Wallet, PaymentPlan, Order
+from sharing.models import Share, Powerbank, PaymentPlan, Order
 from sharing.views.scan import unverified
 from sharing.views.helpers import get_profile, get_last_order, \
-     remaining_min, fail_order
+     remaining_min, fail_order, has_active_subscription
 
 
 @login_required
@@ -27,28 +27,29 @@ def ordering(request, key):
     """
     profile = get_profile(request.user)
     share = Share.objects.get(id=key)
-    if not profile.active_mail or profile.passport_status != 'success':
+    if not profile.active_mail or profile.passport_status != 'success' \
+       or not has_active_subscription(profile):
         return unverified(request)
     if get_last_order(profile).progress == 'applied':
         return redirect('/session')
+    if get_last_order(profile).progress == 'created':
+        return redirect('/pending')
+    if share.free_pbs <= 0:
+        return redirect('/')
     ctx = {"location": share, "small": False,
            "medium": False, "large": False}
-    for power in Powerbank.objects.filter(location=share.id, status='free'):
-        if power.capacity <= 4000:
-            ctx["small"] = True
-        if 4001 <= power.capacity <= 10000:
-            ctx["medium"] = True
-        if power.capacity >= 10001:
-            ctx["large"] = True
-    ctx["key"] = key
-    wallets_id = list(map(int, profile.wallets.split()))
-    wallets = []
-    for wid in wallets_id:
-        cwal = Wallet.objects.filter(id=wid)[0]
-        if cwal.status == 'active':
-            wallets.append(cwal)
+    free_pbs = Powerbank.objects.filter(location=share.id, status='free')
+    min_cap = free_pbs[0].capacity
+    max_cap = free_pbs[0].capacity
+    for powerbank in free_pbs:
+        if powerbank.capacity > max_cap:
+            max_cap = powerbank.capacity
+        if powerbank.capacity < min_cap:
+            min_cap = powerbank.capacity
+    ctx["pk"] = key
     ctx["plans"] = PaymentPlan.objects.all()
-    ctx["wallets"] = wallets
+    ctx["min_cap"] = min_cap
+    ctx["max_cap"] = max_cap
     it_post(request, key, share, ctx)
     return render(request, 'sharing/order.html', context=ctx)
 
@@ -66,9 +67,7 @@ def it_post(request, key, share, ctx):
         order_type = request.POST.get('order_type')
         pb_capacity = request.POST.get('pb_capacity')
         payment_plan_id = request.POST.get('payment_plan')
-        wallet_id = request.POST.get('wallet')
         payment_plan = PaymentPlan.objects.filter(id=payment_plan_id)[0]
-        wallet = Wallet.objects.filter(id=wallet_id)[0]
         if order_type is not None and pb_capacity is not None:
             cands = Powerbank.objects.all().filter(location=key, status='free')
             cand = None
@@ -87,8 +86,7 @@ def it_post(request, key, share, ctx):
                     cand = power
             if cand is not None:
                 if order_type == 'N':
-                    order = Order(wallet=wallet,
-                                  payment_plan=payment_plan,
+                    order = Order(payment_plan=payment_plan,
                                   order_type='immediate',
                                   pb=cand,
                                   share=share,
@@ -96,8 +94,7 @@ def it_post(request, key, share, ctx):
                                   reservation_time=2,
                                   end_share=share)
                 else:
-                    order = Order(wallet=wallet,
-                                  payment_plan=payment_plan,
+                    order = Order(payment_plan=payment_plan,
                                   order_type='hold',
                                   pb=cand,
                                   share=share,
@@ -127,9 +124,6 @@ def pending(request):
         return unverified(request)
     order = get_last_order(get_profile(request.user))
     rem = remaining_min(order)
-
-    print(order.progress)
-
     if rem is not None:
         if rem <= 0:
             fail_order(order)
@@ -139,8 +133,7 @@ def pending(request):
            'timestamp': str(order.timestamp),
            'remaining': int(remaining_min(order)),
            'address': order.share.address,
-           'plan': order.payment_plan.name,
-           'wallet': order.wallet.name}
+           'plan': order.payment_plan.name}
     return render(request, 'scan/pending.html', context=ctx)
 
 
