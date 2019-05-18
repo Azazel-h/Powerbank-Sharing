@@ -7,40 +7,49 @@
     <script src="{% static 'js/instascan.min.js' %}"></script>
     <script src="{% static 'js/jquery.min.js' %}"></script>
 
-    <div class="card">
-      <div class="card-body">
-          <h2 class="card-title"> Сканировать код </h2>
-          <video id="preview" class="text-center"></video>
-      </div>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title"> Сканировать код </h2>
+                <h6 class="card-subtitle text-secondary"> Поднесите QR-code, который изображен на автомате </h6>
+                <hr>
+                <div class="text-center">
+                    <video id="preview" class="text-center rounded"></video>
+                </div>
+            </div>
+        </div>
     </div>
     
 
     <script type="text/javascript">
-      let scanner = new Instascan.Scanner({
-        video: document.getElementById('preview'),
-        mirror: false
-      });
-      scanner.addListener('scan', function (content) {
-        $.ajax({
+        let scanner = new Instascan.Scanner({
+            video: document.getElementById('preview'),
+            mirror: false
+        });
+
+        scanner.addListener('scan', function (content) {
+            $.ajax({
                 type: "POST",
                 url: "/scan",
                 data:{
                     qrcode: content,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
-                success: function (response) {
-                    window.location.href = "session"
+                success: function (response) {         
+                    window.location.href = response
                 }
             })
-      });
-      Instascan.Camera.getCameras().then(function (cameras) {
-        if (cameras.length > 0) {
-          scanner.start(cameras[0]);
-        } else {
-          alert('No cameras found.');
-        }
-      }).catch(function (e) {
-        alert(e);
+        });
+
+
+        Instascan.Camera.getCameras().then(function (cameras) {
+            if (cameras.length > 0) {
+                scanner.start(cameras[0]);
+            } else {
+                alert('No cameras found.');
+            }
+        }).catch(function (e) {
+            alert(e);
       });
     </script>
 

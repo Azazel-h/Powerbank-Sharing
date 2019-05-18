@@ -31,7 +31,7 @@ def ordering(request, key):
         return unverified(request)
     if get_last_order(profile).progress == 'applied':
         return redirect('/session')
-    ctx = {"location": share.address, "small": False,
+    ctx = {"location": share, "small": False,
            "medium": False, "large": False}
     for power in Powerbank.objects.filter(location=share.id, status='free'):
         if power.capacity <= 4000:
@@ -44,7 +44,9 @@ def ordering(request, key):
     wallets_id = list(map(int, profile.wallets.split()))
     wallets = []
     for wid in wallets_id:
-        wallets.append(Wallet.objects.filter(id=wid)[0])
+        cwal = Wallet.objects.filter(id=wid)[0]
+        if cwal.status == 'active':
+            wallets.append(cwal)
     ctx["plans"] = PaymentPlan.objects.all()
     ctx["wallets"] = wallets
     it_post(request, key, share, ctx)
@@ -91,14 +93,16 @@ def it_post(request, key, share, ctx):
                                   pb=cand,
                                   share=share,
                                   profile=get_profile(request.user),
-                                  reservation_time=2)
+                                  reservation_time=2,
+                                  end_share=share)
                 else:
                     order = Order(wallet=wallet,
                                   payment_plan=payment_plan,
                                   order_type='hold',
                                   pb=cand,
                                   share=share,
-                                  profile=get_profile(request.user))
+                                  profile=get_profile(request.user),
+                                  end_share=share)
                 order.save()
                 cand.status = 'ordered'
                 # когда юзер отсканит, тогда cand.status = 'occupied'
@@ -123,6 +127,9 @@ def pending(request):
         return unverified(request)
     order = get_last_order(get_profile(request.user))
     rem = remaining_min(order)
+
+    print(order.progress)
+
     if rem is not None:
         if rem <= 0:
             fail_order(order)

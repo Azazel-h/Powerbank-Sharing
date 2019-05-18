@@ -36,13 +36,6 @@ class Profile(models.Model):
     success - фотография одобрена, проверка прошла успешно
     fail - фотография не одобрена, не прошла проверку
 
-    session_status:
-    inactive - сессия даже не думает быть начатой (по умолчанию)
-    on_begin - скан кода произошел, сессия сейчас начнется
-    active   - сессия активна
-    on_end   - скан кода произошел, сессия сейчас закончится
-    fail     - ошибка в процессе сессии
-
     wallets: string, в котором перечислены id кошельков из модели Wallet
     payment_plans: string, в котором перечислены id доступных
     планов оплаты из модели PaymentPlan
@@ -76,7 +69,7 @@ class Profile(models.Model):
         res = [x for x in list(date.values()) if x not in default]
         return {
             'num-completed': len(res),
-            'percentage': str((100 * len(res) // len(default))) + '%'
+            'percentage': (100 * len(res) // len(default))
         }
 
 
@@ -170,3 +163,7 @@ class Order(models.Model):
     payment_plan = models.ForeignKey(PaymentPlan, on_delete=models.SET_NULL,
                                      null=True)
     wallet = models.ForeignKey(Wallet, on_delete=models.SET_NULL, null=True)
+    end_share = models.ForeignKey(Share, on_delete=models.SET_NULL,
+                                  null=True,
+                                  related_name='end_share')
+    end_timestamp = models.DateTimeField(auto_now_add=True)

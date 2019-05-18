@@ -43,6 +43,7 @@ urlpatterns = [
 
     path('scan', views.scan, name='scan'),
     path('session', views.session, name='session'),
+    path('end', views.end, name='end'),
 
     path('cheat', views.make_verified, name='cheat'),
     url(r'^order/(?P<key>\d+)/$', views.ordering, name='ordering'),
