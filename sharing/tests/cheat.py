@@ -2,6 +2,7 @@ from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from sharing.models import Share, Profile, Order, PaymentPlan, Powerbank
 
+
 class TestCheat(TestCase):
     def setUp(self):
         """
@@ -37,7 +38,6 @@ class TestCheat(TestCase):
         admin = Client()
         admin.login(username='root', password='rootpass')
         response = admin.post('/debug/display_points')
-        
         self.assertEqual(200, response.status_code)
 
     def test_display_points_validation(self):
@@ -73,7 +73,9 @@ class TestCheat(TestCase):
     def test_reset_orders(self):
         admin = Client()
         admin.login(username='root', password='rootpass')
-        p = Powerbank.objects.create(status='free', capacity='20000', location='1')
+        p = Powerbank.objects.create(status='free',
+                                     capacity='20000',
+                                     location='1')
         s = Share.objects.create(free_pbs=1, crds_lot=1, crds_lat=1)
         Order.objects.create(progress='applied', share=s, pb=p)
         admin.post('/debug/reset_orders')

@@ -2,6 +2,7 @@ from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from sharing.models import Profile
 
+
 class TestAddPowerbankSharing(TestCase):
     """
     Класс для тестирования функции add_powerbank_sharing

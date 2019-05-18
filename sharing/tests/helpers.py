@@ -21,7 +21,7 @@ class TestHelpers(TestCase):
                                                   password='rootpass')
         p2 = Profile.objects.create(user=superuser, name='root')
 
-        pb = Powerbank.objects.create(capacity=1000,location=1,status='free')
+        pb = Powerbank.objects.create(capacity=1000, location=1, status='free')
 
     def test_powerbank_percentage(self):
         self.assertEqual(1, powerbank_percentage())

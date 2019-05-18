@@ -151,6 +151,7 @@ def seed_points():
                       qrcode='777777', free_pbs=0)
         share.save()
 
+
 def reset_sessions_and_orders():
     """
 
