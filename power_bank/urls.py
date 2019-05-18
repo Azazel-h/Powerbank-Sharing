@@ -23,6 +23,7 @@ from sharing import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
+    path('404', views.not_found, name='404'),
     path('sharing/add', views.add_powerbank_sharing, name='add_sharing'),
     path('sharing/add_pb', views.add_pb, name='add_power_bank'),
     url(r'^share/(?P<key>\d+)/$', views.share_page, name='share_page'),
@@ -51,7 +52,6 @@ urlpatterns = [
     path('debug/make_verified', views.make_verified, name='make_verified'),
     path('debug/display_points', views.display_points, name='display_points'),
     path('debug/display_orders', views.display_orders, name='display_orders'),
-    path('debug/seed', views.seed, name='seed'),
     path('debug/display_plans', views.display_plans, name='display_plans'),
     path('debug/reset_orders', views.reset_orders, name='reset_orders'),
 

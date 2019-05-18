@@ -72,3 +72,12 @@ def error_rights(request):
     :return:
     """
     return render(request, 'error_rights.html')
+
+
+def not_found(request):
+    """
+    Отсутствие страницы
+    :param request:
+    :return:
+    """
+    return render(request, '404.html')
