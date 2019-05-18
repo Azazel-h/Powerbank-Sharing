@@ -32,6 +32,10 @@ def ordering(request, key):
         return unverified(request)
     if get_last_order(profile).progress == 'applied':
         return redirect('/session')
+    if get_last_order(profile).progress == 'created':
+        return redirect('/pending')
+    if share.free_pbs <= 0:
+        return redirect('/')
     ctx = {"location": share, "small": False,
            "medium": False, "large": False}
     free_pbs = Powerbank.objects.filter(location=share.id, status='free')
