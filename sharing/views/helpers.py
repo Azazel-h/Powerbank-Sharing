@@ -6,7 +6,9 @@
 """
 import datetime
 from random import randint
-from sharing.models import Powerbank, Profile, Share, Order
+from django.shortcuts import redirect, HttpResponse
+from sharing.models import Powerbank, Profile, Share, \
+                           Order, PollQuery
 
 
 def powerbank_percentage():
@@ -102,7 +104,8 @@ def end_order(order, end_share):
     order.end_share = end_share
     power = order.pb
     power.status = 'charging'
-    # requests.get('http://' + order.end_share.ip + '/')
+    eject_query = PollQuery(share_id=order.share.id)
+    eject_query.save()
     order.save()
     power.save()
 
@@ -189,3 +192,24 @@ def has_active_subscription(profile):
         datetime.timedelta(days=profile.payment_plan.duration)
     now = datetime.datetime.now(datetime.timezone.utc)
     return (deadline - now).total_seconds() > 0
+
+
+def poll_refresh(request):
+    """
+    Обновление poll-запросов на открытие автоматов
+    """
+    if request.method == 'GET':
+        reqid = request.GET.get('id')
+        if reqid is None:
+            return redirect('/')
+        machine_id = int(reqid)
+        queries = PollQuery.objects.filter(share_id=machine_id,
+                                           status='pending')
+        qsize = len(queries)
+        if qsize == 0:
+            return HttpResponse('0')
+        for query in queries:
+            query.status = 'done'
+            query.save()
+        return HttpResponse('1')
+    return redirect('/')

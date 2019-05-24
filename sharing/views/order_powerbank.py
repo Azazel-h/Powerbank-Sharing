@@ -46,7 +46,7 @@ def ordering(request, key):
             max_cap = powerbank.capacity
         if powerbank.capacity < min_cap:
             min_cap = powerbank.capacity
-    ctx["pk"] = key
+    ctx["key"] = key
     ctx["plans"] = PaymentPlan.objects.all()
     ctx["min_cap"] = min_cap
     ctx["max_cap"] = max_cap

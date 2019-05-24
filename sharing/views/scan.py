@@ -9,7 +9,7 @@
 """
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
-from sharing.models import Profile, Share
+from sharing.models import Profile, Share, PollQuery
 from sharing.views.helpers import get_last_order, get_profile, \
     end_order, order_duration, has_active_subscription
 
@@ -76,10 +76,12 @@ def session(request):
     if order.progress != 'applied':
         return redirect('/')
     if power.status == 'ordered':
-        # requests.get('http://' + order.share.ip + '/')
+        eject_query = PollQuery(share_id=order.share.id)
+        eject_query.save()
         power.status = 'occupied'
     elif power.status == 'returning':
-        # requests.get('http://' + order.share.ip + '/')
+        eject_query = PollQuery(share_id=order.share.id)
+        eject_query.save()
         power.status = 'charging'
     elif power.status == 'occupied':
         ctx['capacity'] = power.capacity
