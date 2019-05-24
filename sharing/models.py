@@ -162,3 +162,17 @@ class Order(models.Model):
                                   null=True,
                                   related_name='end_share')
     end_timestamp = models.DateTimeField(auto_now_add=True)
+
+
+class PollQuery(models.Model):
+    """
+    share_id: ID автомата
+
+    timestamp: дата-время запроса
+
+    status: pending - запрос ожидает выполнения
+            done - запрос выполнен
+    """
+    share_id = models.IntegerField(default=0)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=128, default='pending')

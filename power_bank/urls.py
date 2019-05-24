@@ -57,7 +57,9 @@ urlpatterns = [
 
     path('payment/add_payment_plan',
          views.add_payment_plan, name='add_payment_plan'),
-    path('subscribe', views.subscribe, name='subscribe')
+    path('subscribe', views.subscribe, name='subscribe'),
+
+    path('qch', views.helpers.poll_refresh, name='querycheck')
 ]
 
 if settings.DEBUG:
