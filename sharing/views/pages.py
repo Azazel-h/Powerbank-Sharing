@@ -9,7 +9,8 @@
 from django.shortcuts import render
 from sharing.models import Share, Profile, Powerbank
 from sharing.views.helpers import check_reservations, get_last_order, \
-    get_profile, remaining_min, fail_order
+    get_profile, remaining_min, fail_order, \
+    auto_email, has_active_subscription
 
 
 def index(request):
@@ -18,6 +19,7 @@ def index(request):
     :param request:
     :return:
     """
+    notsub = False
     free_counted = False
     remaining_started = False
     rem = 0
@@ -33,6 +35,9 @@ def index(request):
         if not Profile.objects.filter(user=request.user).exists():
             new_profile = Profile(user=request.user)
             new_profile.save()
+        auto_email(request.user)
+        profile = get_profile(request.user)
+        notsub = not has_active_subscription(profile)
         order = get_last_order(get_profile(request.user))
         if order.progress == 'created':
             pending_notification = True
@@ -50,7 +55,8 @@ def index(request):
         'pb': Powerbank.get_all(),
         'pending_notification': pending_notification,
         'session_notification': session_notification,
-        'remaining': rem
+        'remaining': rem,
+        'notsub': notsub
     }
 
     return render(request, 'index.html', context)

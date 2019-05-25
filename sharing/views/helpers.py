@@ -213,3 +213,12 @@ def poll_refresh(request):
             query.save()
         return HttpResponse('1')
     return redirect('/')
+
+
+def auto_email(user):
+    """
+    Автоподтверждение мыла
+    """
+    profile = get_profile(user)
+    profile.active_mail = True
+    profile.save()

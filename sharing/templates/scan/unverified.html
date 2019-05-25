@@ -13,6 +13,10 @@
                     {% for i in reasons %}
                         <br> {{ i }}
                     {% endfor %}
+                    {% if notsub %}
+                    <br>
+                    <a class="btn btn btn-outline-success" href="{% url 'subscribe' %}">Подписаться</a>
+                    {% endif %}
                 </p>
                 
             </div>

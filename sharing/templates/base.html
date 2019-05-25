@@ -36,6 +36,9 @@
                             {% endif %}
                             {% block account_tab %}<li class="nav-item"><a class="nav-link" href="{% url 'account' %}"> {{ user.username }} </a></li>{% endblock %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}?next=/"> Выйти </a></li>
+                            {% if notsub %}
+                            <a class="btn btn btn-outline-success" href="{% url 'subscribe' %}">Подписаться</a>
+                            {% endif %}
                         {% else %}
                             {% block login_tab %}<li class="nav-item"><a class="nav-link" href="{% url 'login' %}"> Войти </a></li>{% endblock %}
                             {% block reg_tab %}<li class="nav-item"><a class="nav-link" href="/accounts/signup"> Зарегистрироваться </a></li>{% endblock %}
