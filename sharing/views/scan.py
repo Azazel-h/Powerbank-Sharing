@@ -52,14 +52,18 @@ def unverified(request):
     :return:
     """
     profile = Profile.objects.get(user=request.user)
+    ctx = {}
     reasons = []
+    notsub = not has_active_subscription(profile)
     if not profile.active_mail:
         reasons.append('Не активирован почтовый адрес')
     if not profile.passport_status == 'success':
         reasons.append('Не подтверждён паспорт')
     if not has_active_subscription(profile):
         reasons.append('Нет активных подписок')
-    return render(request, 'scan/unverified.html', {'reasons': reasons})
+    ctx['reasons'] = reasons
+    ctx['notsub'] = notsub
+    return render(request, 'scan/unverified.html', ctx)
 
 
 @login_required

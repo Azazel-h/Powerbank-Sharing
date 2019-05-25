@@ -11,6 +11,7 @@ import json
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from sharing.models import Share, Powerbank
+from sharing.views.helpers import get_profile, has_active_subscription
 
 
 @login_required
@@ -68,6 +69,8 @@ def share_page(request, key):
     :param key:
     :return:
     """
+    profile = get_profile(request.user)
+    notsub = not has_active_subscription(profile)
     pbs = Powerbank.objects.filter(location=key, status='free')
     pb_size = len(pbs)
     if pb_size == 0:
@@ -88,6 +91,7 @@ def share_page(request, key):
         'share': Share.objects.get(id=key),
         'min_cap': min_cap,
         'max_cap': max_cap,
-        'amt': pb_size
+        'amt': pb_size,
+        'notsub': notsub
     }
     return render(request, 'sharing/share_page.html', context)

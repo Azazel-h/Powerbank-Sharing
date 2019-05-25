@@ -17,7 +17,8 @@ from sharing.forms import ChangeFormPassword, SignUpForm, \
      EmailChangeForm, PassportPhotoForm, ChangeNameForm, \
      AvatarPhotoForm
 from sharing.models import Share, Profile, Powerbank
-from sharing.views.helpers import powerbank_percentage
+from sharing.views.helpers import powerbank_percentage, \
+     has_active_subscription
 
 
 @login_required
@@ -47,7 +48,9 @@ def account(request):
             profile.save()
     else:
         form = PassportPhotoForm()
+    notsub = not has_active_subscription(profile)
     context['form'] = form
+    context['notsub'] = notsub
 
     if request.method == 'POST' and request.POST.get('name'):
         name = request.POST.get('name')
