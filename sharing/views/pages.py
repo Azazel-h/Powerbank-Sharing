@@ -9,7 +9,7 @@
 from django.shortcuts import render
 from sharing.models import Share, Profile, Powerbank
 from sharing.views.helpers import check_reservations, get_last_order, \
-    get_profile, remaining_min, fail_order
+    get_profile, remaining_min, fail_order, auto_email
 
 
 def index(request):
@@ -33,6 +33,7 @@ def index(request):
         if not Profile.objects.filter(user=request.user).exists():
             new_profile = Profile(user=request.user)
             new_profile.save()
+        auto_email(request.user)
         order = get_last_order(get_profile(request.user))
         if order.progress == 'created':
             pending_notification = True
