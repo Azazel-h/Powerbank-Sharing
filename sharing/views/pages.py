@@ -56,7 +56,8 @@ def index(request):
         'pending_notification': pending_notification,
         'session_notification': session_notification,
         'remaining': rem,
-        'notsub': notsub
+        'notsub': notsub,
+        'hash' : '8614c69e637e2dc8a2568ffb8ca6c4a76b8942e0967c02b3adbdbed4dbec7331'
     }
 
     return render(request, 'index.html', context)
