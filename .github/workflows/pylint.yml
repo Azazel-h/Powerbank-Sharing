@@ -21,4 +21,4 @@ jobs:
         python manage.py migrate
     - name: Analysing the code with pylint
       run: |
-        pylint -j 0 --load-plugins=pylint_django power_bank/ sharing/
+        pylint --load-plugins=pylint_django power_bank/ sharing/
