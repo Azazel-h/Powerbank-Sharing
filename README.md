@@ -1,4 +1,5 @@
 # PowerBank Sharing - Energo
+[![Django CI](https://github.com/Azazel-h/Powerbank-Sharing/actions/workflows/django.yml/badge.svg)](https://github.com/Azazel-h/Powerbank-Sharing/actions/workflows/django.yml)
 - ##### Наверное, это - был мой первый опыт промышленной разработки. Прошло уже немало времени, но мне кажется данный проект был прекрасной входной точкой.
 > Проекты был сделан в 2018-2019 учениками группы yndx/301 МШП и успешно защищен перед комиссией, даже презентация где-то была.
 > - Собственно я решил загрузить его сюда, иначе он просто пылился бы на закрытом сервере.
