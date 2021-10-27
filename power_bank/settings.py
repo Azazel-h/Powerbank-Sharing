@@ -129,7 +129,7 @@ LOGIN_REDIRECT_URL = '/'
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/sharing/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'sharing/static/'),
+STATIC_ROOT = os.path.join(BASE_DIR, 'sharing/static/')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
