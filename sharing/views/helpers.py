@@ -188,8 +188,7 @@ def has_active_subscription(profile):
     if profile.payment_plan is None:
         return False
     when_ordered = profile.payment_plan_activation_time
-    deadline = when_ordered + \
-        datetime.timedelta(days=profile.payment_plan.duration)
+    deadline = when_ordered + datetime.timedelta(days=profile.payment_plan.duration)
     now = datetime.datetime.now(datetime.timezone.utc)
     return (deadline - now).total_seconds() > 0
 
