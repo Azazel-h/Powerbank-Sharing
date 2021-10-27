@@ -126,4 +126,3 @@ dmypy.json
 .pyre/
 # Secret
 .secret.txt
-*migrations
