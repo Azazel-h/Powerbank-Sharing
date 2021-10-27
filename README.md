@@ -15,4 +15,5 @@ $ python3 manage.py makemigrations
 $ python3 manage.py migrate
 $ python3 manage.py runserver
 ```
-`http://localhost:8000/`
+Или можно просто потыкать что-то на Heroku
+`https://powerbank-sharing.herokuapp.com/`
