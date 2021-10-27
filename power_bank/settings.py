@@ -131,7 +131,7 @@ LOGIN_REDIRECT_URL = '/'
 STATIC_URL = '/sharing/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'sharing/static/'),
 ]
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
