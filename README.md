@@ -16,4 +16,4 @@ $ python3 manage.py migrate
 $ python3 manage.py runserver
 ```
 Или можно просто потыкать что-то на Heroku
-`https://powerbank-sharing.herokuapp.com/`
+<href>https://powerbank-sharing.herokuapp.com/</href>
