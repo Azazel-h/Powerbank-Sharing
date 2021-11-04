@@ -1,12 +1,12 @@
 # PowerBank Sharing - Energo
 [![Django CI](https://github.com/Azazel-h/Powerbank-Sharing/actions/workflows/django.yml/badge.svg)](https://github.com/Azazel-h/Powerbank-Sharing/actions/workflows/django.yml)
-- ##### Наверное, это - был мой первый опыт промышленной разработки. Прошло уже немало времени, но мне кажется данный проект был прекрасной входной точкой.
-> Проекты был сделан в 2018-2019 учениками группы yndx/301 МШП и успешно защищен перед комиссией, даже презентация где-то была.
-> - Собственно я решил загрузить его сюда, иначе он просто пылился бы на закрытом сервере.
-> - Возможно я даже начну его допиливать, но это не точно. Только в свободное от других вещей время.
-> - В любом случае это был приятный опыт работы в команде и хорошая мотивация для меня идти дальше. Ведь идея, которую мы придумали в 2018 году, сейчас используется по всей Москве, пусть и печально, что не нами.
+- ##### It was probably my first industrial development experience. To my mind, it was a great entry point.
+> Created in 2018-2019 by students of yndx/301 MSHP.
+> - I have decided to upload it, 'cause why not?
+> - Probably I will improve it, but still not sure about this.
+> - In any case, it was a really great experience and motivation. An idea, which we invented in 2018 is now used at least in Moscow.
 
-### Как запускать проект
+### How to run the project
 
 ```sh
 $ git clone https://github.com/Azazel-h/Powerbank-Sharing.git
@@ -15,5 +15,5 @@ $ python3 manage.py makemigrations
 $ python3 manage.py migrate
 $ python3 manage.py runserver
 ```
-Или можно просто потыкать что-то на Heroku
+Or you can use Heroku to test something, but it's still in alpha version!
 <href>https://powerbank-sharing.herokuapp.com/</href>
