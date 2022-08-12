@@ -15,5 +15,5 @@ $ python manage.py makemigrations
 $ python manage.py migrate
 $ python manage.py runserver
 ```
-Or you can use Heroku to test something, but it's still in alpha version!/
+Or you can use Heroku to test something, but it's still in alpha version!\
 <href>https://powerbank-sharing.herokuapp.com/</href>
