@@ -11,9 +11,9 @@
 ```sh
 $ git clone https://github.com/Azazel-h/Powerbank-Sharing.git
 $ cd powerbank-sharing
-$ python3 manage.py makemigrations
-$ python3 manage.py migrate
-$ python3 manage.py runserver
+$ python manage.py makemigrations
+$ python manage.py migrate
+$ python manage.py runserver
 ```
 Or you can use Heroku to test something, but it's still in alpha version!/
 <href>https://powerbank-sharing.herokuapp.com/</href>
